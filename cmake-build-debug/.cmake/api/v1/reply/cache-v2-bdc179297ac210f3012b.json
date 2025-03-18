@@ -879,7 +879,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "Project"
+			"value" : "openu_maman14_assmbler"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
@@ -1320,6 +1320,42 @@
 			],
 			"type" : "INTERNAL",
 			"value" : "TRUE"
+		},
+		{
+			"name" : "openu_maman14_assmbler_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "D:/Biton/VisualStudio/.VSC/C/Project/cmake-build-debug"
+		},
+		{
+			"name" : "openu_maman14_assmbler_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "openu_maman14_assmbler_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "D:/Biton/VisualStudio/.VSC/C/Project"
 		}
 	],
 	"kind" : "cache",

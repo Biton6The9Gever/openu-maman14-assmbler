@@ -83,3 +83,12 @@ char *parse_line(char *line, int *amountOflines, int *error)
 {
 	/*TODO*/
 }
+
+char *add_ext_to_file(char *fileName,char *extension)
+{/*Function that add extenstion to a file*/
+	  char *newFileName;
+      newFileName=(char *)malloc((strlen(fileName)+strlen(extension)+1)*sizeof(char));
+	  strcpy(newFileName, fileName); /*copy the new*/
+      strcat(newFileName, extension); /*add extension*/
+      return newFileName;
+}

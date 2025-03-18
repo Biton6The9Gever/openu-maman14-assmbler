@@ -115,6 +115,91 @@ depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 1
 .PHONY : depend
 
+#=============================================================================
+# Target rules for targets named openu_project
+
+# Build rule for target.
+openu_project: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 openu_project
+.PHONY : openu_project
+
+# fast build rule for target.
+openu_project/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/build
+.PHONY : openu_project/fast
+
+PreAssembler.obj: PreAssembler.c.obj
+.PHONY : PreAssembler.obj
+
+# target to build an object file
+PreAssembler.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/PreAssembler.c.obj
+.PHONY : PreAssembler.c.obj
+
+PreAssembler.i: PreAssembler.c.i
+.PHONY : PreAssembler.i
+
+# target to preprocess a source file
+PreAssembler.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/PreAssembler.c.i
+.PHONY : PreAssembler.c.i
+
+PreAssembler.s: PreAssembler.c.s
+.PHONY : PreAssembler.s
+
+# target to generate assembly for a file
+PreAssembler.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/PreAssembler.c.s
+.PHONY : PreAssembler.c.s
+
+Utils.obj: Utils.c.obj
+.PHONY : Utils.obj
+
+# target to build an object file
+Utils.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/Utils.c.obj
+.PHONY : Utils.c.obj
+
+Utils.i: Utils.c.i
+.PHONY : Utils.i
+
+# target to preprocess a source file
+Utils.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/Utils.c.i
+.PHONY : Utils.c.i
+
+Utils.s: Utils.c.s
+.PHONY : Utils.s
+
+# target to generate assembly for a file
+Utils.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/Utils.c.s
+.PHONY : Utils.c.s
+
+main.obj: main.c.obj
+.PHONY : main.obj
+
+# target to build an object file
+main.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/main.c.obj
+.PHONY : main.c.obj
+
+main.i: main.c.i
+.PHONY : main.i
+
+# target to preprocess a source file
+main.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/main.c.i
+.PHONY : main.c.i
+
+main.s: main.c.s
+.PHONY : main.s
+
+# target to generate assembly for a file
+main.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/main.c.s
+.PHONY : main.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -123,6 +208,16 @@ help:
 	@echo ... depend
 	@echo ... edit_cache
 	@echo ... rebuild_cache
+	@echo ... openu_project
+	@echo ... PreAssembler.obj
+	@echo ... PreAssembler.i
+	@echo ... PreAssembler.s
+	@echo ... Utils.obj
+	@echo ... Utils.i
+	@echo ... Utils.s
+	@echo ... main.obj
+	@echo ... main.i
+	@echo ... main.s
 .PHONY : help
 
 
