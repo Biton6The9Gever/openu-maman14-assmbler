@@ -1,0 +1,2 @@
+D:/Biton/VisualStudio/.VSC/C/Project/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/Biton/VisualStudio/.VSC/C/Project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
