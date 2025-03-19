@@ -45,9 +45,10 @@
                 }
                 else if((strncmp(workingLine,MACRO_START,strlen(MACRO_START)) == 0) && (strlen(temp) == strlen(MACRO_START)))
                 {
-                   /*we entered macro declartion */
-                    free(temp);
+                   /*we entered macro declaration */
                     char *macroName;
+                    free(temp);
+
                     if(currentState==count)
                     {
                       printf("ERROR | cannot declare macro inside a macro | Line: %d\n",currentLine);
