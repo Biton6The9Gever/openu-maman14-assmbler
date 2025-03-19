@@ -34,7 +34,7 @@
                 }
 
                 workingLine = pointer_to_first_char(workingLine);
-
+                temp = format_string(workingLine);
                 if((macroFound = check_if_macro_exist(head,workingLine)) != NULL ) /*macro exist replace the name with the code*/
                 {
                     fprintf(outputFile,"%s", macroFound->data);
@@ -43,12 +43,12 @@
                     if (*macroFound->data != '\n' && *macroFound->data != '\0')
                         fprintf(outputFile, "\n");
                 }
-                else if((strncmp(workingLine,MACRO_START,strlen(MACRO_START)) == 0) && (strlen(temp = format_string(workingLine)) == strlen(MACRO_START)))
+                else if((strncmp(workingLine,MACRO_START,strlen(MACRO_START)) == 0) && (strlen(temp) == strlen(MACRO_START)))
                 {
                    /*we entered macro declartion */
-
+                    free(temp);
                     char *macroName;
-                    if(currentState==copy)
+                    if(currentState==count)
                     {
                       printf("ERROR | cannot declare macro inside a macro | Line: %d\n",currentLine);
                       errorAmount++;
@@ -59,7 +59,7 @@
                       errorAmount++;
                     }
 
-                    currentState = copy;
+                    currentState = count;
                     macroStartLine = ftell(inputFile);
 
                     if(macros== NULL)
@@ -109,7 +109,7 @@
                    {
                     	macroSize=MAX(macroEndLine-macroStartLine,0);
                         fseek(inputFile,macroStartLine,SEEK_SET);
-                        currentState = copy;
+                        currentState = save;
                         macros ->data= (char *)malloc(macroSize+1);
                         *(macros->data)=0;
                    }
@@ -122,20 +122,26 @@
                    		currentState = copy;
                    }
                 }
-                else if(currentState == copy)
+                else if(currentState == count)
                 {
                   	macroEndLine = ftell(inputFile);
                 }
                 else if(currentState == save)
                 {
-                    /*TODO*/
+                    strcat(macros->data,workingLine);
+                    /*TODO free data*/
                 }
                 else if (currentState == copy)
                 {
-                    /*TODO*/
+                    fprintf(outputFile,"%s",workingLine);
+                    /*TODO free data*/
                 }
             }
-        return 69;
+        free(orignLine);
+        free_macro_list(macros);
+        if (errorAmount > 0)
+            return -1;
+        return numOfLinesFromParseLine++;
     }
 
 
@@ -153,38 +159,35 @@
 
     void free_macro_list(macroList *macros)
     {/*Function that realse all the Macroes */
-        macroList *temp;
+        macroList *tmp;
         while(macros != NULL)
         {
-            temp = macros;
+            tmp = macros;
             macros = macros->next;
 
-            if(temp->data != NULL)
-                free(temp->data);
-            if(temp->next != NULL)
-                free(temp->next);
-            free(temp);
+            if(tmp->data != NULL)
+                free(tmp->data);
+            if(tmp->next != NULL)
+                free(tmp->next);
+            free(tmp);
         }
 
     }
 
     macroList *check_if_macro_exist(macroList *head,char *name)
     {
-        macroList *temp = head ;
-        char *macroName = format_string(name);
+        macroList *tmp = head ;
+        char *macroNameCopy = format_string(name);
 
-        while(temp != NULL)
-        {
-            while (temp != NULL)
+            while (tmp != NULL)
             {
-                if ((strncmp(temp->name, macroName, strlen(temp->name)) == 0) && (strlen(temp->name) == strlen(macroName)))
+                if ((strncmp(tmp->name, macroNameCopy, strlen(tmp->name)) == 0) && (strlen(tmp->name) == strlen(macroNameCopy)))
                 {
-                    free(macroName);
-                    return temp;
+                    free(macroNameCopy);
+                    return tmp;
                 }
-                temp = temp->next;
+                tmp = tmp->next;
             }
-        }
-        free(macroName);
+        free(macroNameCopy);
         return NULL;
     }

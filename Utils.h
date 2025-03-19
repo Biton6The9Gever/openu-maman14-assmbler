@@ -115,4 +115,4 @@ operation_info return_opertaion(char *macroName);
 int return_register_name(char *macroName);
 
 char *add_ext_to_file(char *fileName,char *extension);
-#endif //UTILS_H
+#endif /*UTILS_H*/

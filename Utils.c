@@ -23,7 +23,7 @@ operation_info emptyOper = {none_oper, none_address, none_address, none_oper_fun
 int is_empty_string(char *str)
 {/*Function that Check if the whole line is white chars*/
       int i=0;
-      while(str[i]=='\0')
+      while(str[i]!='\0')
       {
           if(!isspace(str[i]))
           {
