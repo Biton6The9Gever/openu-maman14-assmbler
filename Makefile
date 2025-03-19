@@ -1,9 +1,9 @@
 CC = gcc
 CFLAGS = -Wall -ansi -pedantic -g
 
-SRCS = firstpass.c main.c secondpass.c preAssembler.c
+SRCS =Utils.c main.c PreAssembler.c
 OBJS = $(SRCS:.c=.o)
-HDRS = firstpass.h constants.h secondpass.h preAssembler.h
+HDRS = Utils.h Constants.h PreAssembler.h
 
 all: assembler
 
