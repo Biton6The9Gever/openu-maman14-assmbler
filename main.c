@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
             fileNumber++;
             continue; /*file is null print error and proceed to the next file*/
         }
-        afterPreAssmblerFileName=add_ext_to_file(argv[fileNumber],ORIGINAL_EXT);
+        afterPreAssmblerFileName=add_ext_to_file(argv[fileNumber],AFTER_PREASSEMBLER_EXT);
         afterPreAssmblerFile = fopen(afterPreAssmblerFileName,"w+");
         errorMacro= parse_macro(currentFile,afterPreAssmblerFile);
         fclose(afterPreAssmblerFile);

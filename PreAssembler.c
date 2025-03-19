@@ -77,7 +77,13 @@
                         macros=macros->next;
                     }
 
+                    macroName = (char*)malloc((strlen(workingLine)+1)*sizeof(char));
+                    strcpy(macroName , pointer_to_first_char(workingLine + strlen(MACRO_START)));
 
+                    macroName[strcspn(macroName,"\n")] = '\0'; /*remove newline char from macroName*/
+                    macros->name = macroName;
+                    macros->data = NULL;
+                    macros->next = NULL;
 
                     if(is_empty_string(workingLine))
                     {/*macro name is empty illegal declartion*/
@@ -94,13 +100,7 @@
                       	printf("ERROR | cannot set macro name same as a register | Line: %d\n",currentLine);
                         errorAmount++;
                     }
-                    macroName = (char*)malloc((strlen(workingLine)+1)*sizeof(char));
-                    strcpy(macroName , pointer_to_first_char(workingLine + strlen(MACRO_START)));
 
-                    macroName[strcspn(macroName,"\n")] = '\0'; /*remove newline char from macroName*/
-                    macros->name = macroName;
-                    macros->data = NULL;
-                    macros->next = NULL;
 
 
                 }

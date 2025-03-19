@@ -55,7 +55,10 @@ char *format_string(char *str)
 operation_info return_opertaion(char *macroName)
 { /*Function that check if a given macro name has a command name*/
     int i;
-    char operatorArray[16][6] = {"mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "jsr", "red", "prn", "rts", "stop"};
+    char operatorArray[16][6] = {
+        "mov", "cmp", "add", "sub", "lea", "clr", "not", "inc",
+        "dec", "jmp", "bne", "jsr", "red", "prn", "rts", "stop"
+    };
 
     for (i = 0; i < sizeof(operatorArray); i++)
     {
