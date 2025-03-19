@@ -1,5 +1,7 @@
 #include "Utils.h"
 
+#include "Constants.h"
+
 operation_info operations[] = {
     {mov, address_0_1_3, address_1_3   , none_oper_funct ,mov_op },
     {cmp, address_0_1_3, address_0_1_3 , none_oper_funct ,cmp_op },
@@ -52,8 +54,8 @@ char *format_string(char *str)
     return newString;
 }
 
-operation_info return_opertaion(char *macroName)
-{ /*Function that check if a given macro name has a command name*/
+operation_info return_opertaion(char *name)
+{ /*Function that check if a given macro/label name has a command name*/
     int i;
     char operatorArray[16][6] = {
         "mov", "cmp", "add", "sub", "lea", "clr", "not", "inc",
@@ -62,7 +64,7 @@ operation_info return_opertaion(char *macroName)
 
     for (i = 0; i < sizeof(operatorArray); i++)
     {
-        if (strcmp(macroName, operatorArray[i]) == 0)
+        if (strcmp(name, operatorArray[i]) == 0)
         {
             return operations[i];
         }
@@ -70,13 +72,13 @@ operation_info return_opertaion(char *macroName)
     return emptyOper;
 }
 
-int return_register_name(char *macroName)
-{/*Function that check if a given macro name has a register name*/
-  	if(macroName[0]== 'r')
+int return_register_name(char *name)
+{/*Function that check if a given label/macro name has a register name*/
+  	if(name[0]== 'r')
   	{
-    	if(strlen(macroName+1)==1 &&((macroName[1]>='0') && (macroName[1]<='7')))
+    	if(strlen(name+1)==1 &&(name[1]>='0' && name[1]<='7'))
     	{
-      		return macroName[1]-'0';
+      		return name[1]-'0';
     	}
   	}
 	return -1;
@@ -96,3 +98,66 @@ char *add_ext_to_file(char *fileName,char *extension)
       strcat(newFileName, extension); /*add extension*/
       return newFileName;
 }
+
+
+int is_label_line(char *str)
+{/*Function that check if there is label in the line */
+    int i,labelLength =0;
+    if (!isalpha(str[0]))/*first char in label name must be a letter*/
+    {
+        return 0;
+    }
+    for (i=0; i <MAX_LABEL_LENGTH;i++)
+    {
+        if(str[i] == ':')
+        {
+            return labelLength;
+        }
+        if(isspace(str[i]))
+        {
+            return 0;
+        }
+        if(isalpha(str[i]) || isdigit(str[i]))
+        {
+            labelLength++;
+        }
+        else /*There is !  @ or other Special char in the name*/
+        {
+            return 0;
+        }
+    }
+    if(str[i]==':')/*In case that the label length is 31*/
+    {
+        return labelLength;
+    }
+    return 0;
+}
+
+int return_direct_value(char *name)
+{
+    /*Function that check if a given label/macro name has a direct number #{num}*/
+    if(name[0]== '#')
+    {
+        if(strlen(name+1)==1 &&(name[1]>='0' && name[1]<='9'))
+        {
+            return name[1]-'0';
+        }
+    }
+    return -1;
+}
+
+int count_char_in_string(char *str, char ch)
+{
+    int counter=0;
+    while (*str != '0')
+    {
+        if (*str==ch)
+        {
+            counter++;
+        }
+        str++;
+    }
+    return counter;
+}
+
+

@@ -43,7 +43,7 @@
                     if (*macroFound->data != '\n' && *macroFound->data != '\0')
                         fprintf(outputFile, "\n");
                 }
-                else if((strncmp(workingLine,MACRO_START,strlen(MACRO_START)) == 0) && (strlen(temp) == strlen(MACRO_START)))
+                else if((strncmp(workingLine,MACRO_START_MARK,strlen(MACRO_START_MARK)) == 0) && (strlen(temp) == strlen(MACRO_START_MARK)))
                 {
                    /*we entered macro declaration */
                     char *macroName;
@@ -54,7 +54,7 @@
                       printf("ERROR | cannot declare macro inside a macro | Line: %d\n",currentLine);
                       errorAmount++;
                     }
-                    if(check_if_macro_exist(head,workingLine+strlen(MACRO_START)) != NULL)
+                    if(check_if_macro_exist(head,workingLine+strlen(MACRO_START_MARK)) != NULL)
                     {
                       printf("ERROR | cannot declare macro twice | Line: %d\n",currentLine);
                       errorAmount++;
@@ -78,7 +78,7 @@
                     }
 
                     macroName = (char*)malloc((strlen(workingLine)+1)*sizeof(char));
-                    strcpy(macroName , pointer_to_first_char(workingLine + strlen(MACRO_START)));
+                    strcpy(macroName , pointer_to_first_char(workingLine + strlen(MACRO_START_MARK)));
 
                     macroName[strcspn(macroName,"\n")] = '\0'; /*remove newline char from macroName*/
                     macros->name = macroName;
@@ -86,25 +86,29 @@
                     macros->next = NULL;
 
                     if(is_empty_string(workingLine))
-                    {/*macro name is empty illegal declartion*/
+                    {/*macro name is empty illegal declaration*/
                         printf("ERROR | cannot set empty macro name | Line: %d\n",currentLine);
                         errorAmount++;
                     }
-                    if(return_opertaion(macros -> name).operationNum != none_oper)
-                    {/*check if the macro name is operation name illegal declartion*/
+                    else if(return_opertaion(macros -> name).operationNum != none_oper)
+                    {/*check if the macro name is operation name illegal declaration*/
                         printf("ERROR | cannot set macro name same as a command | Line: %d\n",currentLine);
                         errorAmount++;
                     }
-                    if(return_register_name(macros->name)!= -1)
+                    else if(return_register_name(macros->name)!= -1)
                     {
                       	printf("ERROR | cannot set macro name same as a register | Line: %d\n",currentLine);
                         errorAmount++;
                     }
-
+                    else if (return_direct_value(macros->name)!= -1)
+                    {
+                        printf("ERROR | cannot set macro name same as a direct number | Line: %d\n",currentLine);
+                        errorAmount++;
+                    }
 
 
                 }
-                else if((strncmp(workingLine,MACRO_END,strlen(MACRO_END)) == 0) &&strlen(workingLine) == strlen(MACRO_END) + 1)
+                else if((strncmp(workingLine,MACRO_END_MARK,strlen(MACRO_END_MARK)) == 0) &&strlen(workingLine) == strlen(MACRO_END_MARK) + 1)
                 {/*+1 because of the new line \n char*/
                   	if(currentState==count)
                    {
@@ -149,6 +153,7 @@
 
     void print_macro_list(macroList *macros)
     {/*Function that Prints the macro list*/
+        /*this method used for debugging*/
         puts("------MACRO-----");
         while(macros != NULL)
         {
@@ -192,3 +197,5 @@
         free(macroNameCopy);
         return NULL;
     }
+
+

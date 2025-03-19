@@ -128,6 +128,30 @@ openu_project/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/build
 .PHONY : openu_project/fast
 
+FirstScan.obj: FirstScan.c.obj
+.PHONY : FirstScan.obj
+
+# target to build an object file
+FirstScan.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/FirstScan.c.obj
+.PHONY : FirstScan.c.obj
+
+FirstScan.i: FirstScan.c.i
+.PHONY : FirstScan.i
+
+# target to preprocess a source file
+FirstScan.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/FirstScan.c.i
+.PHONY : FirstScan.c.i
+
+FirstScan.s: FirstScan.c.s
+.PHONY : FirstScan.s
+
+# target to generate assembly for a file
+FirstScan.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/FirstScan.c.s
+.PHONY : FirstScan.c.s
+
 PreAssembler.obj: PreAssembler.c.obj
 .PHONY : PreAssembler.obj
 
@@ -209,6 +233,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... openu_project
+	@echo ... FirstScan.obj
+	@echo ... FirstScan.i
+	@echo ... FirstScan.s
 	@echo ... PreAssembler.obj
 	@echo ... PreAssembler.i
 	@echo ... PreAssembler.s

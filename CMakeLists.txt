@@ -8,4 +8,5 @@ add_executable( openu_project
         main.c
         PreAssembler.c
         Utils.c
+        FirstScan.c
 )

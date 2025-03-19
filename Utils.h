@@ -110,9 +110,16 @@ char *format_string(char *str);
 
 char *parse_line(char *line, int *amountOflines, int *error);
 
-operation_info return_opertaion(char *macroName);
+operation_info return_opertaion(char *name);
 
-int return_register_name(char *macroName);
+int return_register_name(char *name);
 
 char *add_ext_to_file(char *fileName,char *extension);
+
+int is_label_line(char *str);
+
+int return_direct_value(char *name);
+
+int count_char_in_string(char *str, char ch);
+
 #endif /*UTILS_H*/
