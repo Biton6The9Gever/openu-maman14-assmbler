@@ -3,8 +3,8 @@
 #include "Utils.h"
 /*
     This file contains the Pre Assmbler code
-    In this code we go trought the inputs files and parse all the macroes
-    And dedct minor Errors
+    In this code we go through the inputs files and parse all the macros
+    And detect minor Errors
 */
     int parse_macro(FILE *inputFile,FILE *outputFile)
     {
@@ -12,13 +12,13 @@
         macroList *head = macros;
         enum macro_status currentState = copy;
         char *orignLine = (char*)malloc(MAX_LINE_LENGTH*sizeof(char));
-        char *workingLine = orignLine; /*This line will get edited and worked with so we can process it without demaging the Orign line*/
+        char *workingLine = orignLine; /*This line will get edited and worked with so we can process it without damaging the Orign line*/
         int macroSize=0,errorAmount=0,macroStartLine=0,macroEndLine=0,numOfLinesFromParseLine = 0;
         int currentLine=0;
 
             while(fgets(workingLine,MAX_LINE_LENGTH,inputFile)!= NULL)
             {
-                int error = 0;
+                /*int error = 0;*/
 
                 char *temp=NULL;
                 macroList *macroFound =NULL;
@@ -185,4 +185,6 @@
                 temp = temp->next;
             }
         }
+        free(macroName);
+        return NULL;
     }

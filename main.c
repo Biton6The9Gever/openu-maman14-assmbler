@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "preAssembler.h"
-#include "constants.h"
-#include "utils.h"
+#include "PreAssembler.h"
+#include "Constants.h"
+#include "Utils.h"
 
 int main(int argc, char **argv) {
     int fileNumber=1;

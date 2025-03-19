@@ -82,6 +82,7 @@ int return_register_name(char *macroName)
 char *parse_line(char *line, int *amountOflines, int *error)
 {
 	/*TODO*/
+    return "skibidi";
 }
 
 char *add_ext_to_file(char *fileName,char *extension)
