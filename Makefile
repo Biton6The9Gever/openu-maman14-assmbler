@@ -1,9 +1,9 @@
 CC = gcc
 CFLAGS = -Wall -ansi -pedantic -g
 
-SRCS =Utils.c main.c PreAssembler.c
+SRCS =Utils.c main.c PreAssembler.c FirstScan.c
 OBJS = $(SRCS:.c=.o)
-HDRS = Utils.h Constants.h PreAssembler.h
+HDRS = Utils.h Constants.h PreAssembler.h FirstScan.h
 
 all: assembler
 
