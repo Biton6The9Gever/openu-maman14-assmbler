@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/openu_project.dir/FirstScan.c.obj"
+  "CMakeFiles/openu_project.dir/FirstScan.c.obj.d"
   "CMakeFiles/openu_project.dir/PreAssembler.c.obj"
   "CMakeFiles/openu_project.dir/PreAssembler.c.obj.d"
   "CMakeFiles/openu_project.dir/Utils.c.obj"
