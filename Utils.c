@@ -84,9 +84,42 @@ int return_register_name(char *name)
 	return -1;
 }
 
-char *parse_line(char *line, int *amountOflines, int *error)
+char *parse_line(char *line, int *amountOflines, int *status)
 {
-	/*TODO*/
+	char *workingStr = pointer_to_first_char(line);
+    char *strForToken = malloc((strlen(workingStr) + 1) * sizeof(char));
+    char *token,*tmp,*parsedStr=NULL,*operStr=NULL;
+    int labelNameLength = is_label_line(workingStr);
+    operation_info operation;
+    *status =0;
+    *amountOflines = 0;
+    strcpy(strForToken, workingStr+labelNameLength);
+    token = strtok(strForToken, "\n\t");
+    if (token == NULL)
+    {
+        *status =-1;
+        free(strForToken);
+        return parsedStr;
+    }
+    tmp =pointer_to_first_char(token);
+    if (strcmp(tmp, DATA_MARK) == 0 || strcmp(tmp, STRING_MARK) == 0
+        || strcmp(tmp, ENTRY_MARK) == 0 || strcmp(tmp, EXTERN_MARK) == 0)
+    {
+        *status = -2;
+        free(strForToken);
+        return parsedStr;
+    }
+    free(tmp);
+    operation = return_opertaion(token);
+    operStr =token;
+    /*Function as funct*/
+    if (operation.numOfOperators == none_oper)
+    {
+        *status =-1;
+        free(strForToken);
+        return parsedStr;
+    }
+    parsedStr = parse_cmd();
     return "skibidi";
 }
 
@@ -160,4 +193,53 @@ int count_char_in_string(char *str, char ch)
     return counter;
 }
 
+char *parse_to_binary(int num, int size)
+{
+    char *fullStr = (char *)calloc(size + 1, sizeof(char));
+    int i=size-1;
+    for(;i>=0;i--)
+    {
+        fullStr[i] = (num & 1) ? ONE_BINARY: ZERO_BINARY;
+        num >>= 1; /*Right shift*/
+    }
+
+    return fullStr;
+}
+
+char *parse_first_word(int funct,int destinationRegister,int destinationAddress, int originRegister,int originAddress , int opcode)
+{
+    char *_return = (char *)calloc( (ASSEMBELED_LINE_LENGTH+1)*MAX_CMD_AMOUNT +1 , sizeof(char));
+    char *temp;
+
+    temp = parse_to_binary(opcode, OPCODE_SIZE);
+    strcat(_return, temp);
+    free(temp);
+
+    temp = parse_to_binary(originAddress, ADDRESS_ORIGIN_SIZE);
+    strcat(_return, temp);
+    free(temp);
+
+    temp = parse_to_binary(originRegister, REGISTER_ORIGIN_SIZE);
+    strcat(_return, temp);
+    free(temp);
+
+    temp = parse_to_binary(destinationAddress, ADDRESS_DESTINATION_SIZE);
+    strcat(_return, temp);
+    free(temp);
+
+    temp = parse_to_binary(destinationRegister, REGISTER_DESTINATION_SIZE);
+    strcat(_return, temp);
+    free(temp);
+
+    temp = parse_to_binary(funct, FUNCT_SIZE);
+    strcat(_return, temp);
+    free(temp);
+
+    strcat(_return,"100");
+    return _return;
+}
+
+char * parse_cmd(int *amountOfLines, operation_info operation, int *status, char *wholeStr)
+{
+}
 

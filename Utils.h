@@ -108,7 +108,7 @@ char *pointer_to_first_char(char *str);
 
 char *format_string(char *str);
 
-char *parse_line(char *line, int *amountOflines, int *error);
+char *parse_line(char *line, int *amountOflines, int *status);
 
 operation_info return_opertaion(char *name);
 
@@ -122,4 +122,9 @@ int return_direct_value(char *name);
 
 int count_char_in_string(char *str, char ch);
 
+char *parse_to_binary(int num, int size);
+
+char *parse_first_word(int funct,int destinationRegister,int destinationAddress, int originRegister,int originAddress , int opcode);
+
+char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char *wholeStr);
 #endif /*UTILS_H*/

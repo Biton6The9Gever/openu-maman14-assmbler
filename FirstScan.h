@@ -38,4 +38,17 @@ enum labelType what_label_type(char *str, int labelLength,enum firstScanState cu
 
 labelsList *check_if_label_exist(labelsList *head, char *name);
 
+int data_label_size(char *str);
+
+char *data_to_binary(char *str,int numOfData, int labelLength);
+
+int check_valid_dot(char  *str, int labelLength);
+
+int size_of_data_Label(char *str);
+
+char *string_to_binary(char *str,int strLength ,int labelLength);
+
+void set_DC(labelsList *head,int IC);
+
+void freeLabelsList(labelsList *head);
 #endif /*FIRSTSCAN_H*/

@@ -49,11 +49,6 @@
                     char *macroName;
                     free(temp);
 
-                    if(currentState==count)
-                    {
-                      printf("ERROR | cannot declare macro inside a macro | Line: %d\n",currentLine);
-                      errorAmount++;
-                    }
                     if(check_if_macro_exist(head,workingLine+strlen(MACRO_START_MARK)) != NULL)
                     {
                       printf("ERROR | cannot declare macro twice | Line: %d\n",currentLine);
