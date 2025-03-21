@@ -45,4 +45,5 @@
 #define ONE_BINARY '1'
 #define ZERO_BINARY '0'
 #define ARE_FIRST_WORD "100"
+#define LABEL_SIGN "&"
 #endif /*CONSTANTS_H*/

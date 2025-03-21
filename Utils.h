@@ -91,13 +91,20 @@ enum operation_cmd
 	none_oper_funct = 0
 };
 
+enum operand {
+	operand_1,
+	operand_2,
+	operand_0
+};
+
 typedef struct op_struct
 {
-    enum operation_cmd operationNum;
+    enum operation_cmd operationName;
     enum address_type allowedOrigTypes;
     enum address_type allowedDstTypes;
 	enum funct operationFunct;
-    enum op_code numOfOperators;
+    enum op_code operationNumber;
+	enum operand attributeAmount;
 } operation_info;
 
 extern operation_info operations[];
@@ -127,4 +134,6 @@ char *parse_to_binary(int num, int size);
 char *parse_first_word(int funct,int destinationRegister,int destinationAddress, int originRegister,int originAddress , int opcode);
 
 char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char *wholeStr);
+
+int parse_attribute_string(char *str, int *type, int *val);
 #endif /*UTILS_H*/

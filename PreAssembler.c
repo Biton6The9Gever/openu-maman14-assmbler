@@ -85,7 +85,7 @@
                         printf("ERROR | cannot set empty macro name | Line: %d\n",currentLine);
                         errorAmount++;
                     }
-                    else if(return_opertaion(macros -> name).operationNum != none_oper)
+                    else if(return_opertaion(macros -> name).operationName != none_oper)
                     {/*check if the macro name is operation name illegal declaration*/
                         printf("ERROR | cannot set macro name same as a command | Line: %d\n",currentLine);
                         errorAmount++;

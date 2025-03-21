@@ -322,7 +322,7 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
 void is_valid_name(char *name,int *errorAmount)
 {/*Function that check if the label name is valid*/
 
-        if(return_opertaion(name).operationNum != none_oper)
+        if(return_opertaion(name).operationName != none_oper)
         {
             printf("ERROR |  cannot set label name same as a command  | Label: %s\n",name);
             (*errorAmount)++;
@@ -544,7 +544,7 @@ void set_DC(labelsList *head,int const IC)
     }
 }
 
-void freeLabelsList(labelsList *head)
+void free_labels_list(labelsList *head)
 { /*Function that free the label list*/
     labelsList *tmp;
     while (head != NULL)

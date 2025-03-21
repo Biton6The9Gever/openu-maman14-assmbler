@@ -50,5 +50,5 @@ char *string_to_binary(char *str,int strLength ,int labelLength);
 
 void set_DC(labelsList *head,int IC);
 
-void freeLabelsList(labelsList *head);
+void free_labels_list(labelsList *head);
 #endif /*FIRSTSCAN_H*/
