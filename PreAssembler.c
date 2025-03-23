@@ -15,14 +15,11 @@
         char *workingLine = orignLine; /*This line will get edited and worked with so we can process it without damaging the Orign line*/
         int macroSize=0,errorAmount=0,macroStartLine=0,macroEndLine=0,numOfLinesFromParseLine = 0;
         int currentLine=0;
-
             while(fgets(workingLine,MAX_LINE_LENGTH,inputFile)!= NULL)
             {
                 int error = 0;
-
                 char *temp=NULL;
                 macroList *macroFound =NULL;
-
                 if(currentState != count )
                 {
                     currentLine++;
@@ -155,7 +152,7 @@
 
             }
         free(orignLine);
-        free_macro_list(macros);
+        /*free_macro_list(macros);*/
         if (errorAmount > 0)
             return -1;
         return numOfLinesFromParseLine++;

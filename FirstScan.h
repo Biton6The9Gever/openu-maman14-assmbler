@@ -40,6 +40,8 @@ labelsList *check_if_label_exist(labelsList *head, char *name);
 
 int data_label_size(char *str);
 
+int size_of_string_label(char *str);
+
 char *data_to_binary(char *str,int numOfData, int labelLength);
 
 int check_valid_dot(char  *str, int labelLength);

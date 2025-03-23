@@ -60,7 +60,7 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
                       {
                           labelFound -> location = DC + MEMORY_START;
                           labelFound -> type = entry_data;
-                          if (dataType == entry_data)
+                          if (dataType == data)
                           {
                               int amountOfData= data_label_size(workingLine);
                               char* binaryData;
@@ -77,21 +77,19 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
                           }
                           else if (dataType == string)
                           {
-                              /*instead of calling the function each time we will just save the value its return*/
-                              int temp =check_valid_dot(workingLine,labelNameLength);
-                              if(temp==1)
+                              if(check_valid_dot(workingLine,labelNameLength)==1)
                               {
-                                  int strLength =size_of_data_Label(workingLine);
+                                  int strLength =size_of_string_label(workingLine);
                                   char *binaryStr=string_to_binary(workingLine,strLength,labelNameLength);
                                   fprintf(outputFile,"%s",binaryStr);
                                   DC += strLength;
                               }
-                              else if (temp ==-1)
+                              else if (check_valid_dot(workingLine,labelNameLength) ==-1)
                               {
                                   printf("ERROR | string declared illegally | Label: %s\n",labelName);
                                   errorAmount++;
                               }
-                              else if (temp ==-2)
+                              else if (check_valid_dot(workingLine,labelNameLength) ==-2)
                               {
                                   printf("ERROR | string contained invalid characters | Label: %s\n",labelName);
                                   errorAmount++;
@@ -145,23 +143,22 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
               }
               else if (dataType == string)
               {
-                  int temp =check_valid_dot(workingLine,labelNameLength);
-                  if (temp== 1)
+                  if (check_valid_dot(workingLine,labelNameLength)== 1)
                   {
-                      int strLength =size_of_data_Label(workingLine);
+                      int strLength =size_of_string_label(workingLine);
                       char *binaryString=string_to_binary(workingLine,strLength,labelNameLength);
                       fprintf(outputFile,"%s",binaryString);
 
                       free(binaryString);
                       DC += strLength;
                   }
-                  else if (temp ==-1)
+                  else if (check_valid_dot(workingLine,labelNameLength) ==-1)
                   {
                       *(workingLine +labelNameLength)=0;
                       printf("ERROR | string declared illegally | Label: %s\n",workingLine);
                       errorAmount++;
                   }
-                  else if (temp ==-2)
+                  else if (check_valid_dot(workingLine,labelNameLength) ==-2)
                   {
                       *(workingLine +labelNameLength)=0;
                       printf("ERROR | string contained invalid characters | Label: %s\n",workingLine);
@@ -445,54 +442,50 @@ char *data_to_binary(char *str,int numOfData, int labelLength)
 
 int check_valid_dot(char *str, int labelLength)
 {/* Function that receive a string and check if its valid*/
+    char *copyStr=(char *)malloc((strlen(str)+1)*sizeof(char));
+    char *copyStart =copyStr;
+    int  i,flag;
+    strcpy(copyStr,str);
 
-    int isValid = 1,i=1;
-    char *strCopy = pointer_to_first_char(str); /* Skip leading spaces */
-    char *strCopyStart =strCopy;
-    if (*strCopy == '.')
-    {
-        strCopy = pointer_to_first_char(strCopy + strlen(STRING_MARK));
-    }
+    if (pointer_to_first_char(copyStr)[0] != '.')
+        copyStr=pointer_to_first_char(copyStr+strlen(STRING_MARK));
     else
     {
-        strCopy = pointer_to_first_char(strCopy + labelLength + 1);
-        strCopy = pointer_to_first_char(strCopy + strlen(STRING_MARK));
+        copyStr=pointer_to_first_char(str+labelLength+1);
+        copyStr = pointer_to_first_char(copyStr+strlen(STRING_MARK));
     }
 
-    /* check if the string is null or empty */
-    if (strCopy == NULL || *strCopy != '"')
+    if (copyStr == NULL)
+        return -1;
+
+    if (copyStr[0] != '"')
     {
+        free(copyStart);
         return -1;
     }
 
-    /* go threw the quote  */
-    for (; strCopy[i] != '\0'; i++)
-    {
-        if (strCopy[i] == '\n')
-        {
-            isValid = 0; /* newline inside a string is invalid */
-            break;
+    flag =1;
+    for (i=1;copyStr[i];i++) {
+        if (copyStr[i]!='\n'&& copyStr[i] != '"')
+            continue;
+
+        if (copyStr[i] == '"' && (copyStr[i+1] == '\0' || is_empty_string(copyStr +i +1))) {
+            if (i<=1) {
+                free(copyStart);
+                return -1;
+            }
         }
 
-        if (strCopy[i] == '"')
-        {
-            /* check for a valid closing */
-            if (strCopy[i + 1] == '\0' || is_empty_string(strCopy + i + 1))
-            {
-                if (i <= 1)
-                {
-                    free(strCopyStart);
-                    return -1;
-                } /* Empty string inside quotes is invalid */
-                break;
-            }
-            /*else but not really needed because of the breaks*/
-            isValid = 0;
-            break;
-        }
+        flag =0;
+        break;
     }
 
-    return isValid ? 1 : -2;
+    if (flag ==0) {
+        free(copyStart);
+        return -2;
+    }
+    free(copyStart);
+    return 1;
 }
 
 int size_of_data_Label(char *str)
@@ -512,7 +505,11 @@ int size_of_data_Label(char *str)
     free(strCopyStart);
     return counter;
 }
-
+int size_of_string_label(char *str) {
+    char *start =strchr(str,'"')+1;
+    char *end =strchr(start,'"')-1;
+    return end-start+2;
+}
 char *string_to_binary(char *str,int strLength ,int labelLength)
 {/*Function that parse string to a binary one*/
     char *_return =(char *)calloc(strLength*(ASSEMBELED_LINE_LENGTH+1)+1,sizeof(char));
