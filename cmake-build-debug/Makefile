@@ -176,6 +176,30 @@ PreAssembler.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/PreAssembler.c.s
 .PHONY : PreAssembler.c.s
 
+SecondScan.obj: SecondScan.c.obj
+.PHONY : SecondScan.obj
+
+# target to build an object file
+SecondScan.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/SecondScan.c.obj
+.PHONY : SecondScan.c.obj
+
+SecondScan.i: SecondScan.c.i
+.PHONY : SecondScan.i
+
+# target to preprocess a source file
+SecondScan.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/SecondScan.c.i
+.PHONY : SecondScan.c.i
+
+SecondScan.s: SecondScan.c.s
+.PHONY : SecondScan.s
+
+# target to generate assembly for a file
+SecondScan.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\openu_project.dir\build.make CMakeFiles/openu_project.dir/SecondScan.c.s
+.PHONY : SecondScan.c.s
+
 Utils.obj: Utils.c.obj
 .PHONY : Utils.obj
 
@@ -239,6 +263,9 @@ help:
 	@echo ... PreAssembler.obj
 	@echo ... PreAssembler.i
 	@echo ... PreAssembler.s
+	@echo ... SecondScan.obj
+	@echo ... SecondScan.i
+	@echo ... SecondScan.s
 	@echo ... Utils.obj
 	@echo ... Utils.i
 	@echo ... Utils.s

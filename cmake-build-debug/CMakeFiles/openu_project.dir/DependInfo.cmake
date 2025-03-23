@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "D:/Biton/VisualStudio/.VSC/C/Project/FirstScan.c" "CMakeFiles/openu_project.dir/FirstScan.c.obj" "gcc" "CMakeFiles/openu_project.dir/FirstScan.c.obj.d"
   "D:/Biton/VisualStudio/.VSC/C/Project/PreAssembler.c" "CMakeFiles/openu_project.dir/PreAssembler.c.obj" "gcc" "CMakeFiles/openu_project.dir/PreAssembler.c.obj.d"
+  "D:/Biton/VisualStudio/.VSC/C/Project/SecondScan.c" "CMakeFiles/openu_project.dir/SecondScan.c.obj" "gcc" "CMakeFiles/openu_project.dir/SecondScan.c.obj.d"
   "D:/Biton/VisualStudio/.VSC/C/Project/Utils.c" "CMakeFiles/openu_project.dir/Utils.c.obj" "gcc" "CMakeFiles/openu_project.dir/Utils.c.obj.d"
   "D:/Biton/VisualStudio/.VSC/C/Project/main.c" "CMakeFiles/openu_project.dir/main.c.obj" "gcc" "CMakeFiles/openu_project.dir/main.c.obj.d"
   )

@@ -10,4 +10,5 @@ add_executable( openu_project
         PreAssembler.c
         Utils.c
         FirstScan.c
+        SecondScan.c
 )

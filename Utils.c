@@ -20,7 +20,7 @@ operation_info operations[] = {
     {prn, none_address , address_0_1_3 , none_oper_funct ,prn_op ,operand_1},
     {rts, none_address , none_address  , none_oper_funct ,rts_op ,operand_0},
     {stop, none_address, none_address  , none_oper_funct ,stop_op,operand_0},
-};
+};/*we can call it cmds data base*/
 operation_info emptyOper = {none_oper, none_address, none_address, none_oper_funct, none_oper_op,operand_0};
 
 int is_empty_string(char *str)
@@ -175,7 +175,7 @@ int is_label_line(char *str)
 }
 
 int return_direct_value(char *name)
-{
+{/*function that return the value of a direct number like #3*/
     /*Function that check if a given label/macro name has a direct number #{num}*/
     if(name[0]== '#')
     {
@@ -188,7 +188,7 @@ int return_direct_value(char *name)
 }
 
 int count_char_in_string(char *str, char ch)
-{
+{/*function that count the amount of chars in the line*/
     int counter=0;
     while (*str != '\0')
     {
@@ -202,7 +202,7 @@ int count_char_in_string(char *str, char ch)
 }
 
 char *parse_to_binary(int num, int size)
-{
+{/*function that get number and a size and parse the number in this long char size*/
     char *fullStr = (char *)calloc(size + 1, sizeof(char));
     int i=size-1;
     for(;i>=0;i--)
@@ -215,7 +215,7 @@ char *parse_to_binary(int num, int size)
 }
 
 char *parse_first_word(int funct,int destinationRegister,int destinationAddress, int originRegister,int originAddress , int opcode)
-{
+{/*function that parse the first word of a line*/
     char *_return = (char *)calloc( (ASSEMBELED_LINE_LENGTH+1)*MAX_NUM_OF_CMDS +1 , sizeof(char));
     char *temp;
 
@@ -248,7 +248,7 @@ char *parse_first_word(int funct,int destinationRegister,int destinationAddress,
 }
 
 char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char *wholeStr)
-{
+{/*function that parse the cmd based on the 23 bits model*/
     int destinationRegister=0, destinationAddress=0,  originRegister=0, originAddress =0;
     char *operStr=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*MAX_NUM_OF_CMDS+1,sizeof(char));
     char *parsedLine=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*(MAX_NUM_OF_CMDS-1)+2,sizeof(char));
@@ -595,7 +595,7 @@ int parse_attribute_string(char *str, int *addressType,int *regOrNum)
 
 
 char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *status, char *wholeStr)
-{
+{/*FUNCTION THAT PARSE JMP BNE AND JSR (oops caps) because of there model*/
     int destinationAddress=1,firstAttributeVal=0,firstAttributeType =0,secondAttributeVal=0,secondAttributeType=0;
 
     char *attributeStr=(char *)calloc((ASSEMBELED_LINE_LENGTH+1)*(MAX_NUM_OF_CMDS-1)+1,sizeof(char));
