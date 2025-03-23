@@ -2,6 +2,7 @@
 #include "PreAssembler.h"
 #include "Constants.h"
 #include "FirstScan.h"
+#include "SecondScan.h"
 #include "Utils.h"
 
 int main(int argc, char **argv) {
@@ -14,8 +15,8 @@ int main(int argc, char **argv) {
         FILE *currentFile = fopen(currentFileName,"r");
         char *afterPreAssmblerFileName;
         FILE *afterPreAssmblerFile;
-        /*char *fileFirstScanName;
-        FILE *fileFirstScan;*/
+        char *fileFirstScanName;
+        FILE *fileFirstScan;
         labelsList *labelTable;
         int instructionLength;
         int dataLength,error =0,errorMacro=0;
@@ -51,6 +52,37 @@ int main(int argc, char **argv) {
 
            /* continue;*/
         }
+
+        fileFirstScanName = add_ext_to_file(argv[fileNumber],AFTER_SECOND_PASS_EXT);
+        fileFirstScan = fopen(fileFirstScanName,"w+");
+
+        if (second_scan(fileFirstScan,argv[fileNumber],labelTable,instructionLength,dataLength) != 0) {
+            if (labelTable != NULL) {
+                free_labels_list(labelTable);
+                labelTable = NULL;
+            }
+            fclose(fileFirstScan);
+            remove(fileFirstScanName);
+            free(fileFirstScanName);
+            free(currentFileName);
+            fclose(currentFile);
+
+            fileNumber++;
+        }
+        else {
+            free(currentFileName);
+            fclose(currentFile);
+            free(fileFirstScanName);
+            fclose(fileFirstScan);
+            free(afterPreAssmblerFileName);
+            fclose(currentFile);
+
+
+            if (labelTable != NULL)
+                free_labels_list(labelTable);
+
+            fileNumber++;
+        }
     }
-    return 1;
+    return 0;
 }
