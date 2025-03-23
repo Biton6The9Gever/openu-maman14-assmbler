@@ -119,8 +119,16 @@ char *parse_line(char *line, int *amountOflines, int *status)
         free(strForToken);
         return parsedStr;
     }
-    parsedStr = parse_cmd();
-    return "skibidi";
+    if (operation.operationName == jmp || operation.operationName == bne || operation.operationName == jsr)
+        parsedStr = parse_JMP_BNE_JSR(amountOflines,operation,status,workingStr);
+    else
+        parsedStr = parse_cmd(amountOflines,operation,status,workingStr);
+
+    if (*status <0) {
+        free(strForToken);
+        return parsedStr;
+    }
+
 }
 
 char *add_ext_to_file(char *fileName,char *extension)
@@ -208,7 +216,7 @@ char *parse_to_binary(int num, int size)
 
 char *parse_first_word(int funct,int destinationRegister,int destinationAddress, int originRegister,int originAddress , int opcode)
 {
-    char *_return = (char *)calloc( (ASSEMBELED_LINE_LENGTH+1)*MAX_CMD_AMOUNT +1 , sizeof(char));
+    char *_return = (char *)calloc( (ASSEMBELED_LINE_LENGTH+1)*MAX_NUM_OF_CMDS +1 , sizeof(char));
     char *temp;
 
     temp = parse_to_binary(opcode, OPCODE_SIZE);
@@ -242,8 +250,8 @@ char *parse_first_word(int funct,int destinationRegister,int destinationAddress,
 char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char *wholeStr)
 {
     int destinationRegister=0, destinationAddress=0,  originRegister=0, originAddress =0;
-    char *operStr=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*MAX_CMD_AMOUNT+1,sizeof(char));
-    char *parsedLine=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*(MAX_CMD_AMOUNT-1)+2,sizeof(char));
+    char *operStr=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*MAX_NUM_OF_CMDS+1,sizeof(char));
+    char *parsedLine=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*(MAX_NUM_OF_CMDS-1)+2,sizeof(char));
     *(amountOfLines) = 0;
     char *token;
     if (operation.attributeAmount == operand_0 )
@@ -327,7 +335,7 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
     }
     else if (operation.attributeAmount == operand_2)
     {
-        char *firstWord,firstOper,*secondOper,*secondToken;
+        char *firstWord,*firstOper,*secondOper,*secondToken;
         int temp=count_char_in_string(wholeStr,',');
 
         if (temp !=1)
@@ -345,7 +353,8 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
 
             return NULL;
         }
-        if (parse_attribute_string(token,&destinationAddress,&destinationRegister)==-1)
+        if (parse_attribute_string(token,&originAddress,&originRegister)==-1)
+
         {
             *status = -4; /*Invalid operand*/
         }
@@ -365,7 +374,187 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
             *status = -4; /*Invalid operand*/
         }
         *amountOfLines = 3;
-        firstWord =parse_first_word(operation.operationFunct,destinationRegister,);
+        firstWord =parse_first_word(operation.operationFunct,destinationRegister,destinationAddress,originRegister,originAddress, operation.operationNumber);
+        strcat(parsedLine,firstWord);
+        free(firstWord);
+        firstOper=NULL;
+        secondOper=NULL;
+        if (originAddress == 3)
+        {
+            if (destinationAddress ==3)
+            {
+                char *temp =parse_to_binary(0,2);
+                *(amountOfLines)--;
+                firstOper=parse_to_binary(originRegister,6);
+                secondOper=parse_to_binary(destinationRegister,6);
+
+                strcat(operStr,"\n");
+                strcat(operStr,firstOper);
+                strcat(operStr,secondOper);
+                strcat(operStr,temp);
+                strcat(parsedLine,operStr);
+
+                free(temp);
+                free(firstOper);
+                free(secondOper);
+            }
+            else if (destinationAddress ==1)
+            {
+                char *temp =parse_to_binary(0,8);
+                firstOper=parse_to_binary(originRegister,6);
+                secondOper=secondToken;
+
+                strcat(operStr,"\n");
+                strcat(operStr,firstOper);
+                strcat(operStr,temp);
+                strcat(operStr,"\n");
+                strcat(operStr,LABEL_SIGN);
+                strcat(operStr,secondOper);
+                strcat(parsedLine,operStr);
+
+                free(temp);
+                free(firstOper);
+            }
+            else if (destinationAddress ==0)
+            {
+                char *temp =parse_to_binary(0,8);
+                firstOper=parse_to_binary(originRegister,6);
+                secondOper=parse_to_binary(destinationRegister,ASSEMBELED_LINE_LENGTH-2);
+                strcat(firstOper,temp);
+                free(temp);
+
+                temp = parse_to_binary(0,2);
+                strcat(secondOper,temp);
+                free(temp);
+
+                strcat(operStr,"\n");
+                strcat(operStr,firstOper);
+                strcat(operStr,"\n");
+                strcat(operStr,secondOper);
+                strcat(parsedLine,operStr);
+
+                free(firstOper);
+                free(secondOper);
+            }
+        }
+
+        else if (originAddress ==1)
+        {
+            if (destinationAddress ==3)
+            {
+                char *temp =parse_to_binary(0,6);
+                secondOper=parse_to_binary(destinationAddress,6);
+
+                strcat(operStr,"\n");
+                strcat(operStr,LABEL_SIGN);
+                strcat(operStr,token);
+                strcat(operStr,"\n");
+                strcat(operStr,temp);
+                free(temp);
+
+                temp = parse_to_binary(0,2);
+                strcat(operStr,secondOper);
+                strcat(operStr,temp);
+                free(temp);
+                strcat(parsedLine,operStr);
+
+                free(secondToken);
+            }
+            else if (destinationAddress ==1)
+            {
+                strcat(operStr,"\n");
+                strcat(operStr,LABEL_SIGN);
+                strcat(operStr,token);
+                strcat(operStr,"\n");
+                strcat(operStr,LABEL_SIGN);
+                strcat(operStr,secondToken);
+                strcat(parsedLine,operStr);
+            }
+            else if (destinationAddress ==0)
+            {
+                char *temp =parse_to_binary(0,2);
+                secondOper=parse_to_binary(destinationAddress,ASSEMBELED_LINE_LENGTH-2);
+
+                strcat(secondOper,temp);
+                free(temp);
+                strcat(operStr,"\n");
+                strcat(operStr,LABEL_SIGN);
+                strcat(operStr,token);
+                strcat(operStr,"\n");
+                strcat(operStr,secondOper);
+                strcat(parsedLine,operStr);
+
+                free(secondOper);
+            }
+        }
+        else if (originAddress ==0)
+        {
+            if (destinationAddress ==3)
+            {
+                char *temp =parse_to_binary(0,2);
+                firstOper=parse_to_binary(originRegister,ASSEMBELED_LINE_LENGTH-2);
+                secondOper=parse_to_binary(destinationRegister,6);
+
+                strcat(firstOper,temp);
+                free(temp);
+
+                temp = parse_to_binary(0,6);
+                strcat(operStr,"\n");
+                strcat(operStr,firstOper);
+                strcat(operStr,"\n");
+                strcat(operStr,temp);
+                free(temp);
+
+                temp=parse_to_binary(0,2);
+                strcat(operStr,secondOper);
+                strcat(operStr,temp);
+                strcat(parsedLine,operStr);
+
+                free(temp);
+                free(firstOper);
+                free(secondOper);
+            }
+            else if (destinationAddress ==1)
+            {
+                char *temp =parse_to_binary(0,2);
+                firstOper=parse_to_binary(originAddress,ASSEMBELED_LINE_LENGTH-2);
+
+                strcat(firstOper,temp);
+                free(temp);
+
+                strcat(operStr,"\n");
+                strcat(operStr,firstOper);
+                strcat(operStr,"\n");
+                strcat(operStr,LABEL_SIGN);
+                strcat(operStr,secondToken);
+                strcat(parsedLine,operStr);
+
+                free(firstOper);
+            }
+            else if (destinationAddress ==0)
+            {
+                char *temp =parse_to_binary(0,2);
+
+                firstOper=parse_to_binary(originAddress,ASSEMBELED_LINE_LENGTH-2);
+                secondOper=parse_to_binary(destinationAddress,ASSEMBELED_LINE_LENGTH-2);
+
+                strcat(firstOper,temp);
+                strcat(secondOper,temp);
+
+                free(temp);
+
+                strcat(operStr,"\n");
+                strcat(operStr,firstOper);
+                strcat(operStr,"\n");
+                strcat(operStr,secondOper);
+                strcat(parsedLine,operStr);
+
+                free(firstOper);
+                free(secondOper);
+            }
+        }
+        free(operStr);
+        return parsedLine;
     }
 
 }
@@ -401,5 +590,149 @@ int parse_attribute_string(char *str, int *addressType,int *regOrNum)
     /*label or invalid*/
     *addressType =1;
     return 0;
+}
+
+
+char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *status, char *wholeStr)
+{
+    int destinationAddress=1,firstAttributeVal=0,firstAttributeType =0,secondAttributeVal=0,secondAttributeType=0;
+
+    char *attributeStr=(char *)calloc((ASSEMBELED_LINE_LENGTH+1)*(MAX_NUM_OF_CMDS-1)+1,sizeof(char));
+
+    char *parsedStr = (char *)calloc((ASSEMBELED_LINE_LENGTH+1)*MAX_NUM_OF_CMDS+2,sizeof(char));
+
+    char *token=strtok(NULL, " :,()\n");
+    int attributeType=0;
+    int attributeVal=0;
+    char *emptyLine= parse_to_binary(0,2);
+    char *firstWord,*secondToken=NULL;
+
+    if (token ==NULL)
+    {
+        *status= -4; /*invalid attribute*/
+        if (emptyLine != NULL)
+            free(emptyLine);
+        if (parsedStr != NULL)
+            free(parsedStr);
+        if (attributeStr != NULL)
+            free(attributeStr);
+        return NULL;
+    }
+
+    if (parse_attribute_string(token,&attributeType,&attributeVal)==- 1)
+    {
+        *status= -4; /*invalid attribute*/
+    }
+    if (attributeType!=1)
+    {
+        *status= -4; /*invalid attribute*/
+        if (emptyLine != NULL)
+            free(emptyLine);
+        if (parsedStr != NULL)
+            free(parsedStr);
+        if (attributeStr != NULL)
+            free(attributeStr);
+        return NULL;
+    }
+    else
+    {
+        (*amountOfLines)++;
+        strcat(attributeStr,"\n");
+        strcat(attributeStr,LABEL_SIGN);
+        strcat(attributeStr,token);
+        token =strtok(NULL, ",)");
+    }
+    if (token !=NULL) {
+        if (count_char_in_string(wholeStr,',')!=1)
+        {
+            *status =- 3; /*invalid Line*/
+        }
+        destinationAddress =2;
+        if (parse_attribute_string(token,&firstAttributeType,&firstAttributeVal)==- 1)
+            *status= -4; /*invalid attribute*/
+        secondToken=strtok(NULL, ",)");
+        if (secondToken !=NULL)
+        {
+            if (parse_attribute_string(secondToken,&secondAttributeType,&secondAttributeVal)==- 1)
+                *status= -4; /*invalid attribute*/
+        }
+        else
+            *status = -5; /*invalid attribute */
+
+        if (firstAttributeType==-1 && secondAttributeType==-1)
+            *status = -5; /*invalid attribute */
+        else
+        {
+            char *firstStr=NULL;
+            char *secondStr=NULL;
+
+            if (firstAttributeType==3 && secondAttributeType==3)
+            {
+                char *temp =parse_to_binary(0,2);
+                *(amountOfLines)++;
+                firstStr=parse_to_binary(firstAttributeVal,6);
+                secondStr=parse_to_binary(secondAttributeVal,6);
+
+                strcat(attributeStr,"\n");
+                strcat(attributeStr,firstStr);
+                strcat(attributeStr,secondStr);
+                strcat(attributeStr,temp);
+                free(temp);
+            }
+            else
+            {
+                *(amountOfLines)++;
+                if (firstAttributeType !=1)
+                {
+                    char *temp =parse_to_binary(0,2);
+                    strcat(attributeStr,"\n");
+                    firstStr=parse_to_binary(firstAttributeVal,ASSEMBELED_LINE_LENGTH-2);
+                    strcat(attributeStr,firstStr);
+                    strcat(attributeStr,temp);
+                    free(temp);
+                }
+                else
+                {
+                    strcat(attributeStr,"\n");
+                    strcat(attributeStr,LABEL_SIGN);
+                    strcat(attributeStr,token);
+                }
+                if (secondAttributeType !=1)
+                {
+                    char *temp =parse_to_binary(0,2);
+                    strcat(attributeStr,"\n");
+                    secondStr=parse_to_binary(secondAttributeVal,ASSEMBELED_LINE_LENGTH-2);
+                    strcat(attributeStr,secondStr);
+                    strcat(attributeStr,temp);
+                    free(temp);
+                }
+                else
+                {
+                    strcat(attributeStr,"\n");
+                    strcat(attributeStr,LABEL_SIGN);
+                    strcat(attributeStr,secondToken);
+                }
+            }
+            if (secondStr !=NULL)
+                free(secondStr);
+            if (firstStr !=NULL)
+                free(firstStr);
+        }
+    }
+    else
+        if (count_char_in_string(wholeStr,',')!=0)
+            *status= -3; /*invalid Line*/
+
+    (*amountOfLines)++;
+    firstWord = parse_first_word(operation.operationFunct,firstAttributeVal,MAX(firstAttributeType,0),secondAttributeVal,MAX(secondAttributeVal,0),operation.operationNumber);
+    strcat(parsedStr,firstWord);
+    free(firstWord);
+    strcat(parsedStr,attributeStr);
+
+    if (emptyLine != NULL)
+        free(emptyLine);
+    if (attributeStr != NULL)
+        free(attributeStr);
+    return parsedStr;
 }
 

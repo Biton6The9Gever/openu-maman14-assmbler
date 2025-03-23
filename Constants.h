@@ -4,7 +4,7 @@
 /* Length Barriers */
 #define MAX_LINE_LENGTH 80+1 /* +1 for the \n char in the end of the line*/
 #define MAX_LABEL_LENGTH 31
-#define MAX_CMD_AMOUNT 4
+#define MAX_NUM_OF_CMDS 4
 #define ASSEMBELED_LINE_LENGTH 24 /*amount of bits*/
 
 /* Macro Marks */

@@ -135,5 +135,7 @@ char *parse_first_word(int funct,int destinationRegister,int destinationAddress,
 
 char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char *wholeStr);
 
+char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *status, char *wholeStr);
+
 int parse_attribute_string(char *str, int *type, int *val);
 #endif /*UTILS_H*/

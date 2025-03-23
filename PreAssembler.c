@@ -18,7 +18,7 @@
 
             while(fgets(workingLine,MAX_LINE_LENGTH,inputFile)!= NULL)
             {
-                /*int error = 0;*/
+                int error = 0;
 
                 char *temp=NULL;
                 macroList *macroFound =NULL;
@@ -47,7 +47,6 @@
                 {
                    /*we entered macro declaration */
                     char *macroName;
-                    free(temp);
 
                     if(check_if_macro_exist(head,workingLine+strlen(MACRO_START_MARK)) != NULL)
                     {
@@ -129,13 +128,31 @@
                 else if(currentState == save)
                 {
                     strcat(macros->data,workingLine);
-                    /*TODO free data*/
+                    free(parse_line(workingLine,&numOfLinesFromParseLine,&error));
                 }
                 else if (currentState == copy)
                 {
                     fprintf(outputFile,"%s",workingLine);
-                    /*TODO free data*/
+                    free(parse_line(workingLine,&numOfLinesFromParseLine,&error));
                 }
+
+                if (error ==-1)
+                {
+                    printf("ERROR | Missing info | Line: %d\n",currentLine);
+                    errorAmount++;
+                }
+                else if (error==-2 || error ==-3)
+                {
+                    printf("ERROR | Invalid line | Line: %d\n",currentLine);
+                    errorAmount++;
+                }
+                else if (error == -4)
+                {
+                    printf("ERROR | Invalid operand | Line: %d\n",currentLine);
+                    errorAmount++;
+                }
+                    free(temp);
+
             }
         free(orignLine);
         free_macro_list(macros);
