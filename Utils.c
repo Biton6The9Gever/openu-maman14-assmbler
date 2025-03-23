@@ -88,7 +88,7 @@ char *parse_line(char *line, int *amountOflines, int *status)
 {
 	char *workingStr = pointer_to_first_char(line);
     char *strForToken = malloc((strlen(workingStr) + 1) * sizeof(char));
-    char *token,*tmp,*parsedStr=NULL,*operStr=NULL;
+    char *token,*tmp,*parsedStr=NULL;
     int labelNameLength = is_label_line(workingStr);
     operation_info operation;
     *status =0;
@@ -111,9 +111,8 @@ char *parse_line(char *line, int *amountOflines, int *status)
     }
     free(tmp);
     operation = return_opertaion(token);
-    operStr =token;
     /*Function as funct*/
-    if (operation.operationNumber == none_oper)
+    if (operation.operationNumber == none_oper_op)
     {
         *status =-2; /*Invalid operation*/
         free(strForToken);
@@ -128,7 +127,7 @@ char *parse_line(char *line, int *amountOflines, int *status)
         free(strForToken);
         return parsedStr;
     }
-
+    return parsedStr; /*won't get here*/
 }
 
 char *add_ext_to_file(char *fileName,char *extension)
@@ -252,8 +251,9 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
     int destinationRegister=0, destinationAddress=0,  originRegister=0, originAddress =0;
     char *operStr=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*MAX_NUM_OF_CMDS+1,sizeof(char));
     char *parsedLine=(char*)calloc((ASSEMBELED_LINE_LENGTH+1)*(MAX_NUM_OF_CMDS-1)+2,sizeof(char));
-    *(amountOfLines) = 0;
     char *token;
+    *(amountOfLines) = 0;
+
     if (operation.attributeAmount == operand_0 )
     {
         char *firstWord = parse_first_word(operation.operationFunct,0,0,0,0,operation.operationNumber);
@@ -384,7 +384,7 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
             if (destinationAddress ==3)
             {
                 char *temp =parse_to_binary(0,2);
-                *(amountOfLines)--;
+                (*amountOfLines)--;
                 firstOper=parse_to_binary(originRegister,6);
                 secondOper=parse_to_binary(destinationRegister,6);
 
@@ -553,10 +553,9 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
                 free(secondOper);
             }
         }
-        free(operStr);
-        return parsedLine;
     }
-
+    free(operStr);
+    return parsedLine;
 }
 
 int parse_attribute_string(char *str, int *addressType,int *regOrNum)
@@ -669,7 +668,7 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
             if (firstAttributeType==3 && secondAttributeType==3)
             {
                 char *temp =parse_to_binary(0,2);
-                *(amountOfLines)++;
+                (*amountOfLines)++;
                 firstStr=parse_to_binary(firstAttributeVal,6);
                 secondStr=parse_to_binary(secondAttributeVal,6);
 
@@ -681,7 +680,7 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
             }
             else
             {
-                *(amountOfLines)++;
+                (*amountOfLines)++;
                 if (firstAttributeType !=1)
                 {
                     char *temp =parse_to_binary(0,2);
@@ -724,7 +723,7 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
             *status= -3; /*invalid Line*/
 
     (*amountOfLines)++;
-    firstWord = parse_first_word(operation.operationFunct,firstAttributeVal,MAX(firstAttributeType,0),secondAttributeVal,MAX(secondAttributeVal,0),operation.operationNumber);
+    firstWord = parse_first_word(operation.operationFunct,MAX(firstAttributeVal,0),destinationAddress,MAX(secondAttributeVal,0),0,operation.operationNumber);
     strcat(parsedStr,firstWord);
     free(firstWord);
     strcat(parsedStr,attributeStr);
