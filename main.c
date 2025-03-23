@@ -8,7 +8,7 @@
 int main(int argc, char **argv) {
     int fileNumber=1;
 
-    /*while(fileNumber <argc)*/
+    while(fileNumber <argc)
     {/*the first element of argv is the file name with the program*/
 
         char *currentFileName =add_ext_to_file(argv[fileNumber],ORIGINAL_EXT);
@@ -24,11 +24,13 @@ int main(int argc, char **argv) {
         {
             printf("\n ERROR | error while opening a file | FILE: %s\n", currentFileName);
             fileNumber++;
-            /*continue;*/ /*file is null print error and proceed to the next file*/
+            continue; /*file is null print error and proceed to the next file*/
         }
         afterPreAssmblerFileName=add_ext_to_file(argv[fileNumber],AFTER_PREASSEMBLER_EXT);
         afterPreAssmblerFile = fopen(afterPreAssmblerFileName,"w+");
+        printf("PRE PARSE-MACRO\n");
         errorMacro= parse_macro(currentFile,afterPreAssmblerFile);
+        printf("PARSE-MACRO\n");
         fclose(afterPreAssmblerFile);
         afterPreAssmblerFile = fopen(afterPreAssmblerFileName,"r");
         labelTable = first_scan(afterPreAssmblerFile,&instructionLength,&dataLength,&error);
@@ -50,7 +52,7 @@ int main(int argc, char **argv) {
             free(afterPreAssmblerFileName);
             free(currentFileName);
 
-           /* continue;*/
+            continue;
         }
 
         fileFirstScanName = add_ext_to_file(argv[fileNumber],AFTER_SECOND_PASS_EXT);
@@ -75,7 +77,6 @@ int main(int argc, char **argv) {
             free(fileFirstScanName);
             fclose(fileFirstScan);
             free(afterPreAssmblerFileName);
-            fclose(currentFile);
 
 
             if (labelTable != NULL)

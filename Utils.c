@@ -100,12 +100,14 @@ char *parse_line(char *line, int *amountOflines, int *status)
     token = strtok(strForToken, "\n\t: ");
     if (token == NULL)
     {
+        printf("TOKEN - NULL\n");
         *status =-1; /*missing info*/
         /*free(strForToken);*/
         return parsedStr;
     }
     if (return_dot_type(token)!= code)
     {
+        printf("NONE-CODE\n");
         *status = -2; /*Invalid operation*/
         free(strForToken);
         return parsedStr;
@@ -114,6 +116,7 @@ char *parse_line(char *line, int *amountOflines, int *status)
     /*Function as funct*/
     if (operation.operationNumber == none_oper_op)
     {
+        printf("\n");
         *status =-2; /*Invalid operation*/
         return parsedStr;
     }

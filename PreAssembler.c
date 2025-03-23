@@ -125,11 +125,13 @@
                 else if(currentState == save)
                 {
                     strcat(macros->data,workingLine);
+                    printf("MACRO-SAVE\n");
                     free(parse_line(workingLine,&numOfLinesFromParseLine,&error));
                 }
                 else if (currentState == copy)
                 {
                     fprintf(outputFile,"%s",workingLine);
+                    printf("MACRO-COPY\n");
                     free(parse_line(workingLine,&numOfLinesFromParseLine,&error));
                 }
 
