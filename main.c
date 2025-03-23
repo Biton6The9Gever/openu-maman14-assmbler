@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "PreAssembler.h"
 #include "Constants.h"
+#include "FirstScan.h"
 #include "Utils.h"
 
 int main(int argc, char **argv) {
@@ -12,7 +13,11 @@ int main(int argc, char **argv) {
         FILE *currentFile = fopen(currentFileName,"r");
         char *afterPreAssmblerFileName;
         FILE *afterPreAssmblerFile;
-        int errorMacro;
+        char *fileFirstScanName;
+        FILE *fileFirstScan;
+        labelsList *labelTable;
+        int instructionLength;
+        int dataLength,error =0,errorMacro;
         if(currentFile == NULL)
         {
             printf("\n ERROR | error while opening a file | FILE: %s\n", currentFileName);
@@ -23,9 +28,29 @@ int main(int argc, char **argv) {
         afterPreAssmblerFile = fopen(afterPreAssmblerFileName,"w+");
         errorMacro= parse_macro(currentFile,afterPreAssmblerFile);
         fclose(afterPreAssmblerFile);
+        afterPreAssmblerFile = fopen(afterPreAssmblerFileName,"r");
+        labelTable = first_scan(afterPreAssmblerFile,&instructionLength,&dataLength,&error);
+        fclose(afterPreAssmblerFile);
         fclose(currentFile);
         printf("%d \n",errorMacro);
 
+        if (error > 0 || errorMacro < 0)
+        {
+            printf("\n ERROR | error while opening a file * skipped *| FILE: %s\n", afterPreAssmblerFileName);
+            fileNumber++;
+
+            if (labelTable != NULL)
+            {
+                free_labels_list(labelTable);
+                labelTable = NULL;
+            }
+            fclose(currentFile);
+            remove(afterPreAssmblerFileName);
+            free(afterPreAssmblerFileName);
+            free(currentFileName);
+
+           /* continue;*/
+        }
     }
     return 1;
 }

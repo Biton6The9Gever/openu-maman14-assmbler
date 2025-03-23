@@ -64,7 +64,7 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
                           {
                               int amountOfData= data_label_size(workingLine);
                               char* binaryData;
-                              if(count_char_in_string(workingLine,",") != amountOfData-1)
+                              if(count_char_in_string(workingLine,',') != amountOfData-1)
                               {
                                   printf("ERROR |  invalid data label declaration | Label: %s\n",labelName);
                                   errorAmount++;
@@ -82,7 +82,7 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
                               if(temp==1)
                               {
                                   int strLength =size_of_data_Label(workingLine);
-                                  char *binaryStr=string_to_binary(workingLine,strLength,labelName);
+                                  char *binaryStr=string_to_binary(workingLine,strLength,labelNameLength);
                                   fprintf(outputFile,"%s",binaryStr);
                                   DC += strLength;
                               }
@@ -132,7 +132,7 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
               {
                   char* binaryData;
                   int amountOfData= data_label_size(workingLine);
-                  if (count_char_in_string(workingLine,",") != amountOfData-1)
+                  if (count_char_in_string(workingLine,',') != amountOfData-1)
                   {
                       printf("ERROR |  invalid data label declaration \n");
                       errorAmount++;
@@ -413,7 +413,6 @@ char *data_to_binary(char *str,int numOfData, int labelLength)
 {/*Function that get data and transfer it into binary*/
     char *copy=(char *)malloc((strlen(str)+1)*sizeof(char));
     char *copyStart =copy;
-    char *binaryStr;
     char *placeHolder;
     /*this will contain the string as binary which we will return*/
     char *_return=(char *)calloc((numOfData * (ASSEMBELED_LINE_LENGTH+1))+1,sizeof(char));
@@ -499,7 +498,7 @@ int check_valid_dot(char *str, int labelLength)
 int size_of_data_Label(char *str)
 {/*Function that check the size of data label and returns it*/
     int counter =0;
-    char strCopy=(char *)malloc((strlen(str)+1)*sizeof(char));
+    char *strCopy=(char *)malloc((strlen(str)+1)*sizeof(char));
     char *strCopyStart =strCopy;
     char *token;
     strcpy(strCopy,str);
