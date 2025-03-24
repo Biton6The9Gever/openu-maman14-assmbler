@@ -8,7 +8,7 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
       int IC=100,DC =0;
 
       /*line number and error amount in this file*/
-      int lineNumber,errorAmount=0;
+      int lineNumber=0,errorAmount=0;
 
       char *orignLine = (char*)malloc(MAX_LINE_LENGTH*sizeof(char));
       /*This line will get edited and worked with so we can process it without damaging the Orign line*/
@@ -25,295 +25,293 @@ labelsList *first_scan(FILE *inputFile,int* lengthInstruction,int* lengthData, i
 
       FILE *outputFile;
       outputFile = fopen(FIRSTSCAN_TEMP_FILE_NAME,"w");
-      while(fgets(workingLine,MAX_LINE_LENGTH,inputFile) != NULL)
-      {
-          char *binaryWord =NULL;
-          int labelNameLength =0;
-          char *checkedLabel;
-          lineNumber++;
-          labelNameLength = is_label_line(workingLine);
 
-          if(labelNameLength != 0)
-          {
-              currentState = defining;
-              checkedLabel =(char *)calloc(labelNameLength+1,sizeof(char));
-              strncpy(checkedLabel,workingLine,labelNameLength);
-              is_valid_name(checkedLabel,&errorAmount);
-              free(checkedLabel);
-          }
+        while (fgets(workingLine, MAX_LINE_LENGTH, inputFile) != NULL)
+        {
+            char *parsedLine =NULL;
+            int labelNameLength=0;
+            char *checkLabel;
+            lineNumber++;
+            labelNameLength = is_label_line(workingLine);/*contain label Length if not its 0*/
+            if (labelNameLength != 0) {
+                currentState = defining;
+                checkLabel =(char *)calloc(labelNameLength+1,sizeof(char));
+                strncpy(checkLabel,workingLine,labelNameLength);
+                if(return_opertaion(checkLabel).operationName != none_oper)
+                {
+                    printf("ERROR |  cannot set label name same as a command  | Label: %s\n",checkLabel);
+                    errorAmount++;
+                }
+                else if(return_register_name(checkLabel) != -1) /*label cant have operation name and register name*/
+                {
+                    printf("ERROR |  cannot set label name same as a register  | Label: %s\n",checkLabel);
+                    errorAmount++;
+                }
+                else if(return_direct_value(checkLabel) != -1)
+                {
+                    printf("ERROR |  cannot set label name same as a direct number  | Label: %s\n",checkLabel);
+                    errorAmount++;
+                }
+                free(checkLabel);
+            }
+            /*if there is a label .data or .string*/
+            if ((dataType = what_label_type(workingLine ,errorAmount,currentState))) {
+                if (currentState == defining) {
+                    char *labelName;
+                    labelsList *labelFound =NULL;
+                    labelName = (char *)malloc((labelNameLength+1)*sizeof(char));
+                    strncpy(labelName,workingLine,labelNameLength);
+                    labelName[labelNameLength]='\0';
+                    labelName[strcspn(labelName,":")]='\0';
+                    if ((labelFound=check_if_label_exist(head,labelName))!=NULL){
+                        /*add label as entry*/
+                        if (labelFound->type ==entry && labelFound->location ==-1) {
+                            labelFound ->location =DC +MEMORY_START;
+                            labelFound->type =entry_data;
 
-          dataType=what_label_type(workingLine,labelNameLength,currentState);
-          if(dataType)
-          {
-              if(currentState == defining)
-              {
-                  char *labelName =(char *)malloc((labelNameLength+1)*sizeof(char));
-                  labelsList *labelFound =NULL;
-                  strncpy(labelName,workingLine,labelNameLength);
-                  labelName[labelNameLength] = '\0';
-                  labelName[strcspn(labelName,":")] = '\0';
-                  labelFound= check_if_label_exist(head,labelName);
-                  if (labelFound != NULL)
-                  {
-                      /*add label as a entry*/
-                      if (labelFound->type == entry && labelFound->location == -1)
-                      {
-                          labelFound -> location = DC + MEMORY_START;
-                          labelFound -> type = entry_data;
-                          if (dataType == data)
-                          {
-                              int amountOfData= data_label_size(workingLine);
-                              char* binaryData;
-                              if(count_char_in_string(workingLine,',') != amountOfData-1)
-                              {
-                                  printf("ERROR |  invalid data label declaration | Label: %s\n",labelName);
-                                  errorAmount++;
-                              }
-                              binaryData = data_to_binary(workingLine,amountOfData,labelNameLength);
-                              fprintf(outputFile,"%s",binaryData);
+                            if (dataType == data) {
+                                int amountOfData =size_of_data_Label(workingLine);
+                                char *parseData;
 
-                              free(binaryData);
-                              DC += amountOfData;
-                          }
-                          else if (dataType == string)
-                          {
-                              if(check_valid_dot(workingLine,labelNameLength)==1)
-                              {
-                                  int strLength =size_of_string_label(workingLine);
-                                  char *binaryStr=string_to_binary(workingLine,strLength,labelNameLength);
-                                  fprintf(outputFile,"%s",binaryStr);
-                                  DC += strLength;
-                              }
-                              else if (check_valid_dot(workingLine,labelNameLength) ==-1)
-                              {
-                                  printf("ERROR | string declared illegally | Label: %s\n",labelName);
-                                  errorAmount++;
-                              }
-                              else if (check_valid_dot(workingLine,labelNameLength) ==-2)
-                              {
-                                  printf("ERROR | string contained invalid characters | Label: %s\n",labelName);
-                                  errorAmount++;
-                              }
-                          }
-                          currentState = none;
-                      }
-                      else
-                      {
-                          printf("ERROR | cannot define label twice | Label: %s\n",labelName);
-                          errorAmount++;
-                      }
-                      if (labelName != NULL)
-                      {
-                          free(labelName);
-                      }
-                      continue;
-                  }
-                  if (labels ==NULL)
-                  {
-                      labels =(labelsList *)malloc(sizeof(labelsList));
-                      if (head == NULL)
-                      {
-                          head = labels;
-                      }
-                  }
-                  else
-                  {
-                      labels->next=(labelsList *)malloc(sizeof(labelsList));
-                      labels->next=labels;
-                  }
-                  labels->name =labelName;
-                  labels->type =data;
-                  labels->location =DC + MEMORY_START;
-                  labels->next =NULL;
-              }
-              if (dataType==data)
-              {
-                  char* binaryData;
-                  int amountOfData= data_label_size(workingLine);
-                  if (count_char_in_string(workingLine,',') != amountOfData-1)
-                  {
-                      printf("ERROR |  invalid data label declaration \n");
-                      errorAmount++;
-                  }
-                  binaryData = data_to_binary(workingLine,amountOfData,labelNameLength);
-                  fprintf(outputFile,"%s",binaryData);
+                                if (count_char_in_string(workingLine,',')!=amountOfData) {
+                                    printf("ERROR |  invalid Data declartion  | Label: %s\n",labelName);
+                                    errorAmount++;
+                                }
+                                parseData  =data_to_binary(workingLine,amountOfData,labelNameLength);
+                                fprintf(outputFile,"%s",parseData);
+                                free(parseData);
+                                DC+=amountOfData;
+                            }
+                            else if (dataType==string) {
+                                if (check_valid_dot(workingLine,labelNameLength)==1) {
+                                    int strLength =size_of_string_label(workingLine);
+                                    char *parsedData=string_to_binary(workingLine,strLength,labelNameLength);
+                                    fprintf(outputFile,"%s\n",parsedData);
+                                    free(parsedData);
+                                    DC+=strLength;
+                                }
+                                else if (check_valid_dot(workingLine,labelNameLength)==-1) {
+                                    printf("ERROR |  invalid String declartion  | Label: %s\n",labelName);
+                                    errorAmount++;
+                                }
+                                else if(check_valid_dot(workingLine,labelNameLength)==-2) {
+                                    printf("ERROR |  string contains invalid letters  | Label: %s\n",labelName);
+                                    errorAmount++;
+                                }
+                            }
+                            currentState = none;
+                        }
+                        else {
+                            printf("ERROR | cannot define same label twice | Label: %s\n",labelName);
+                            errorAmount++;
+                        }
+                        if (labelName !=NULL) {
+                            free(labelName);
+                        }
+                        continue;
+                    }
+                    /*adding label to data base*/
+                    if (labels == NULL) {
+                        labels =(labelsList *)malloc(sizeof(labelsList));
+                        if (head == NULL) {
+                            head =labels;
+                        }
+                    }
+                    else {
+                        labels->next = (labelsList *)malloc(sizeof(labelsList));
+                        labels = labels->next;
+                    }
+                    labels->name =labelName;
 
-                  DC += amountOfData;
-                  free(binaryData);
-              }
-              else if (dataType == string)
-              {
-                  if (check_valid_dot(workingLine,labelNameLength)== 1)
-                  {
-                      int strLength =size_of_string_label(workingLine);
-                      char *binaryString=string_to_binary(workingLine,strLength,labelNameLength);
-                      fprintf(outputFile,"%s",binaryString);
+                    labels->location =DC +MEMORY_START;
+                    labels->type =data;
+                    labels->next = NULL;
+                }
 
-                      free(binaryString);
-                      DC += strLength;
-                  }
-                  else if (check_valid_dot(workingLine,labelNameLength) ==-1)
-                  {
-                      *(workingLine +labelNameLength)=0;
-                      printf("ERROR | string declared illegally | Label: %s\n",workingLine);
-                      errorAmount++;
-                  }
-                  else if (check_valid_dot(workingLine,labelNameLength) ==-2)
-                  {
-                      *(workingLine +labelNameLength)=0;
-                      printf("ERROR | string contained invalid characters | Label: %s\n",workingLine);
-                      errorAmount++;
-                  }
-              }
-              currentState = none;
-              continue;
-          }
-          /*Check if caught entry or extern declaration */
-          if (strncmp(workingLine,ENTRY_MARK,strlen(ENTRY_MARK)) == 0 || strncmp(workingLine,EXTERN_MARK,strlen(EXTERN_MARK)) == 0)
-          {
-              char *labelName =NULL;
-              labelsList *labelFound=NULL;
-              if (strncmp(workingLine,ENTRY_MARK,strlen(ENTRY_MARK)) == 0)
-              {
-                  labelName =format_string(workingLine+strlen(ENTRY_MARK));
-                  labelFound =check_if_label_exist(head,labelName);
-                  if (labelFound != NULL)
-                  {
-                      if (labelFound->type ==external)
-                      {
-                          printf("ERROR | label cannot be extern and entry at the same time | Label: %s\n",labelName);
-                          *error = 1;
-                          errorAmount++;
-                      }
-                      if (labelFound->type ==data)
-                      {
-                          labelFound->type =entry_data;
-                      }
-                      else if (labelFound->type ==code)
-                      {
-                          labelFound->type =entry;
-                      }
+                if (dataType == data) {
+                    char *parsedData;
+                    int amonutOfData=size_of_data_Label(workingLine);
+                    if (count_char_in_string(workingLine,',')!=amonutOfData-1) {
+                        printf("ERROR | Invalid data label declaration\n");
+                        errorAmount++;
+                    }
+                    parsedData =data_to_binary(workingLine,amonutOfData,labelNameLength);
+                    fprintf(outputFile,"%s",parsedData);
+                    free(parsedData);
+                    DC +=amonutOfData;
+                }
+                else if (dataType==string) {
+                    if (check_valid_dot(workingLine,labelNameLength)==1) {
+                        int strLength =size_of_string_label(workingLine);
+                        char *parsedData=string_to_binary(workingLine,strLength,labelNameLength);
+                        fprintf(outputFile,"%s\n",parsedData);
+                        free(parsedData);
+                        DC +=strLength;
+                    }
+                    else if (check_valid_dot(workingLine,labelNameLength)==-1) {
+                        printf("ERROR |  invalid String declartion  | Label: %s\n",workingLine);
+                        errorAmount++;
+                    }
+                    else if(check_valid_dot(workingLine,labelNameLength)==-2) {
+                        printf("ERROR |  string contains invalid letters  | Label: %s\n",workingLine);
+                        errorAmount++;
+                    }
+                }
+                currentState = none;
+                continue;
+            }
+            else if (strncmp(workingLine,ENTRY_MARK,strlen(ENTRY_MARK)) == 0 || strncmp(workingLine,EXTERN_MARK,strlen(EXTERN_MARK)) == 0) {
+                char *labelName=NULL;
 
-                      if (labelName != NULL)
-                      {
-                          free(labelName);
-                      }
-                      continue;
-                  }
+                labelsList *labelFound=NULL;
+                if (strncmp(workingLine,ENTRY_MARK,strlen(ENTRY_MARK)) == 0) {
+                   labelName=format_string(workingLine+strlen(ENTRY_MARK));
 
-              }
-              else if ( strncmp(workingLine,EXTERN_MARK,strlen(EXTERN_MARK)) == 0)
-              {
-                  labelName =format_string(workingLine+strlen(EXTERN_MARK));
-                  labelFound =check_if_label_exist(head,labelName);
-                  if (labelFound != NULL)
-                  {
-                      printf("ERROR | cannot define label more the one time | Label: %s\n",labelName);
-                      free(labelName);
-                      errorAmount++;
-                      continue;
-                  }
-              }
-              /*we went threw the cases as when the label DO exist
-               * else we have to create it */
-              if (labels ==NULL)
-              {
-                  labels =(labelsList *)malloc(sizeof(labelsList));
-                  if (head == NULL)
-                  {
-                      head = labels;
-                  }
-              }
-              else
-              {
-                  labels->next=(labelsList *)malloc(sizeof(labelsList));
-                  labels->next=labels;
-              }
-              labels->name = labelName;
-              labels->location = -1; /* -1 stands for | no value |*/
-              labels->next = NULL;
+                    if ((labelFound=check_if_label_exist(head,labelName))!=NULL) {
+                        if (labelFound->type ==external) {
+                            printf("ERROR | cannot make label extern and entern  | Label: %s\n",labelName);
+                            *error =1 ;
+                            errorAmount++;
+                        }
+                        if (labelFound->type ==data) {
+                            labelFound->type=entry_data;
+                        }
+                        else if (labelFound->type ==code) {
+                            labelFound->type =entry;
+                        }
 
-              if (strncmp(workingLine,ENTRY_MARK,strlen(ENTRY_MARK)) == 0)
-              {
-                  labels->type=entry;
-              }
-              else
-              {
-                  labels->type=external;
-              }
-              is_valid_name(labelName,&errorAmount);
-              continue;
-          }
-          /*Normal label without and .mark and append it into the table*/
-          if (currentState == defining)
-          {
-              char *labelName =NULL;
-              labelsList *labelFound=NULL;
-              labelName= (char *)malloc((labelNameLength+2)*sizeof(char));
-              strncpy(labelName,workingLine,labelNameLength+1);
-              labelName[strspn(labelName,":")]='\0';
-              labelFound =check_if_label_exist(head,labelName);
-              if (labelFound != NULL)
-              {
-                  /*if its entry label we set IC */
-                  if (labelFound->type ==entry && labelFound->location == -1)
-                  {
-                      labelFound->location = IC+MEMORY_START;
-                  }
-                  else
-                  {
-                      printf("ERROR | cannot define label more the one time | Label: %s\n",labelName);
-                      errorAmount++;
-                  }
-                  if (labelName != NULL)
-                      free(labelName);
-                  continue;
-              }
-              /*adding the current label to the linked list*/
-              if (labels == NULL)
-              {
-                  labels = (labelsList *)malloc(sizeof(labelsList));
-                  if (head == NULL)
-                  {
-                      head = labels;
-                  }
-              }
-              else
-              {
-                  labels->next = (labelsList *)malloc(sizeof(labelsList));
-                  labels = labels->next;
-              }
-              labels->name = labelName;
-              labels->location = IC + MEMORY_START;
-              labels->type = code;
-              labels->next = NULL;
-              currentState = none;
-          }
-          binaryWord =parse_line(workingLine,&numberOfOperationsLines,error);
-          if (binaryWord != NULL)
-          {
-              fprintf(outputFile,"%s\n",binaryWord);
-              free(binaryWord);
-          }
-          /* IC + L*/
-          IC += numberOfOperationsLines;
+                        if (labelName !=NULL) {
+                            free(labelName);
+                        }
+                        continue;
+                    }
+                }
+                else if (strncmp(workingLine,EXTERN_MARK,strlen(EXTERN_MARK)) == 0) {
+                    labelName=format_string(workingLine+strlen(EXTERN_MARK));
+                    if ((labelFound=check_if_label_exist(head,labelName))!=NULL) {
+                        printf("ERROR | cannot define label more then once | Label: %s\n",labelName);
+                        free(labelName);
+                        errorAmount++;
+                        continue;
+                    }
+                }
 
+                if (labels == NULL)
+                {
+                    labels = (labelsList *)malloc(sizeof(labelsList));
+                    if (head == NULL)
+                    {
+                        head = labels;
+                    }
+                }
+                else
+                {
+                    labels->next = (labelsList *)malloc(sizeof(labelsList));
+                    labels = labels->next;
+                }
+
+                labels->name = labelName;
+                labels->location = -1; /*-1 means no value*/
+                labels->next = NULL;
+
+                if (strncmp(workingLine, ENTRY_MARK, strlen(ENTRY_MARK)) == 0)
+                { /*if the new label is .entry*/
+                    labels->type = entry;
+                }
+                else
+                {
+                    /*if the new label is .extern*/
+                    labels->type = external;
+                }
+
+                /*check errors in labelName*/
+                if (is_empty_string(labelName))
+                {
+                    printf("\nERROR | cannot define empty label | \n");
+                    errorAmount++;
+                }
+                if (return_opertaion(labels->name).operationNumber != none_oper_op)
+                {
+                    printf("\nERROR | cannot define label as a command | Label: %s\n", labels->name);
+                    errorAmount++;
+                }
+
+                if (return_register_name(labels->name) != -1)
+                {
+                    printf("\nERROR | cannot define label as a register | Label: %s\n", labels->name);
+                    errorAmount++;
+                }
+
+                continue;
+            }
+
+            if (currentState == defining) {
+                char *labelName;
+                labelsList *labelFound=NULL;
+
+                labelName =(char *)malloc((labelNameLength+2)*sizeof(char));
+                strncpy(labelName,workingLine,labelNameLength+1);
+                labelName[strcspn(labelName,":")]='\0';
+
+                if ((labelFound =check_if_label_exist(head,labelName)) != NULL) {
+                    if (labelFound->type ==entry && labelFound->location == -1) {
+                        labelFound ->location=IC+MEMORY_START;
+                    }
+                    else {
+                        printf("\nERROR | cannot define label more then once| Label: %s\n", labelName);
+                        errorAmount++;
+                    }
+
+                    if (labelName != NULL) {
+                        free(labelName);
+                    }
+                    continue;
+                }
+                /*adding the current label to the linked list*/
+                if (labels == NULL)
+                {
+                    labels = (labelsList *)malloc(sizeof(labelsList));
+                    if (head == NULL)
+                    {
+                        head = labels;
+                    }
+                }
+                else
+                {
+                    labels->next = (labelsList *)malloc(sizeof(labelsList));
+                    labels = labels->next;
+                }
+
+                labels->name = labelName;
+                labels->location = IC + MEMORY_START;
+                labels->type = code;
+                labels->next = NULL;
+                currentState = none;
+            }
+
+            parsedLine =parse_line(workingLine,&numberOfOperationsLines,error);
+
+            if (parsedLine != NULL) {
+                fprintf(outputFile,"%s\n",parsedLine);
+                free(parsedLine);
+            }
+            IC+= numberOfOperationsLines;
       }
-      if (errorAmount>0)
-      {
-          remove(FIRSTSCAN_TEMP_FILE_NAME);
-          free(orignLine);
-          fclose(outputFile);
-          free_labels_list(head);
-          *error=1;
-          return NULL;
-      }
-      set_DC(head,IC);
-      *lengthData=DC;
-      *lengthInstruction=IC;
-      free(orignLine);
-      fclose(outputFile);
-      return head;
+    if (errorAmount>0) {
+        remove(FIRSTSCAN_TEMP_FILE_NAME);
+        free(workingLine);
+        fclose(outputFile);
+        free_labels_list(head);
+        *error =1;
+        return NULL;
+    }
+
+    set_DC(head,IC);
+    *lengthInstruction=IC;
+    *lengthData=DC;
+    free(workingLine);
+    fclose(outputFile);
+    return head;
 }
 
 void is_valid_name(char *name,int *errorAmount)
@@ -352,6 +350,7 @@ enum labelType what_label_type(char *str, int labelLength,enum firstScanState cu
      /*caught in .string mark */
      if(strcmp(instructLine,STRING_MARK) == 0)
      {
+
          free(instructLine);
          return string;
      }
@@ -369,7 +368,6 @@ enum labelType what_label_type(char *str, int labelLength,enum firstScanState cu
 labelsList *check_if_label_exist(labelsList *head, char *name)
 {/*Function that check if label already exist by name searching*/
     labelsList *tmp = head;
-
     char *labelNameCopy = format_string(name);
 
     while (tmp != NULL && tmp->name != NULL)
@@ -382,7 +380,7 @@ labelsList *check_if_label_exist(labelsList *head, char *name)
         tmp = tmp->next;
     }
 
-    free(labelNameCopy);
+    /*free(labelNameCopy);*/
     return NULL;
 }
 
@@ -440,18 +438,20 @@ char *data_to_binary(char *str,int numOfData, int labelLength)
     return _return;
 }
 
-int check_valid_dot(char *str, int labelLength)
+int  check_valid_dot(char *str, int labelLength)
 {/* Function that receive a string and check if its valid*/
     char *copyStr=(char *)malloc((strlen(str)+1)*sizeof(char));
     char *copyStart =copyStr;
     int  i,flag;
     strcpy(copyStr,str);
 
-    if (pointer_to_first_char(copyStr)[0] != '.')
+    if (pointer_to_first_char(copyStr)[0] == '.') {
         copyStr=pointer_to_first_char(copyStr+strlen(STRING_MARK));
+    }
+
     else
     {
-        copyStr=pointer_to_first_char(str+labelLength+1);
+        copyStr=pointer_to_first_char(copyStr+labelLength+1);
         copyStr = pointer_to_first_char(copyStr+strlen(STRING_MARK));
     }
 
@@ -474,10 +474,12 @@ int check_valid_dot(char *str, int labelLength)
                 free(copyStart);
                 return -1;
             }
+            break;
         }
-
-        flag =0;
-        break;
+        else {
+            flag =0;
+            break;
+        }
     }
 
     if (flag ==0) {
@@ -554,3 +556,33 @@ void free_labels_list(labelsList *head)
         free(tmp);
     }
 }
+
+void printLabelsList(labelsList *head)
+{ /*This function prints the labels list*/
+    puts("---labels---");
+    while (head != NULL)
+    {
+        printf("name: %s count: %d\n", head->name, head->location);
+        head = head->next;
+    }
+    puts("---labels---");
+}
+
+void trim_carriage_return(char *str) {
+    int start = 0,i;
+    int end = strlen(str) - 1;
+
+    while (str[start] == 13) {
+        start++;
+    }
+
+    while (str[end] == 13) {
+        end--;
+    }
+
+    for (i = start; i <= end; i++) {
+        str[i - start] = str[i];
+    }
+    str[end - start + 1] = '\0';
+}
+

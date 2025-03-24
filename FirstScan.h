@@ -53,4 +53,8 @@ char *string_to_binary(char *str,int strLength ,int labelLength);
 void set_DC(labelsList *head,int IC);
 
 void free_labels_list(labelsList *head);
+
+void printLabelsList(labelsList *head);
+
+void trim_carriage_return(char *str);
 #endif /*FIRSTSCAN_H*/

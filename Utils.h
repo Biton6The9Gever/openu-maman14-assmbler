@@ -139,4 +139,6 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
 
 int parse_attribute_string(char *str, int *type, int *val);
 
+void trim_trailing(char *str);
+
 #endif /*UTILS_H*/

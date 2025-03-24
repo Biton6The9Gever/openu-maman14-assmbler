@@ -20,7 +20,7 @@ operation_info operations[] = {
     {prn, none_address , address_0_1_3 , none_oper_funct ,prn_op ,operand_1},
     {rts, none_address , none_address  , none_oper_funct ,rts_op ,operand_0},
     {stop, none_address, none_address  , none_oper_funct ,stop_op,operand_0},
-};/*we can call it cmds data base*/
+};/*we can call it cmds database*/
 operation_info emptyOper = {none_oper, none_address, none_address, none_oper_funct, none_oper_op,operand_0};
 
 int is_empty_string(char *str)
@@ -62,12 +62,17 @@ operation_info return_opertaion(char *name)
         "mov", "cmp", "add", "sub", "lea", "clr", "not", "inc",
         "dec", "jmp", "bne", "jsr", "red", "prn", "rts", "stop"
     };
-
     for (i = 0; i < sizeof(operatorArray); i++)
     {
         if (strcmp(name, operatorArray[i]) == 0)
         {
             return operations[i];
+        }
+        if (i == 15) {
+            if (strncmp(name, "stop", 4) == 0) {
+                name[4] = '\0';
+                return operations[i];
+            }
         }
     }
     return emptyOper;
@@ -100,15 +105,13 @@ char *parse_line(char *line, int *amountOflines, int *status)
     token = strtok(strForToken, "\n\t: ");
     if (token == NULL)
     {
-        printf("TOKEN - NULL\n");
         *status =-1; /*missing info*/
         /*free(strForToken);*/
         return parsedStr;
     }
     if (return_dot_type(token)!= code)
     {
-        printf("NONE-CODE\n");
-        *status = -2; /*Invalid operation*/
+        *status = 1; /*none code operation*/
         free(strForToken);
         return parsedStr;
     }
@@ -116,22 +119,22 @@ char *parse_line(char *line, int *amountOflines, int *status)
     /*Function as funct*/
     if (operation.operationNumber == none_oper_op)
     {
-        printf("\n");
         *status =-2; /*Invalid operation*/
         return parsedStr;
     }
-    if (operation.operationName == jmp || operation.operationName == bne || operation.operationName == jsr)
+    if (operation.operationName == jmp || operation.operationName == bne || operation.operationName == jsr) {
         parsedStr = parse_JMP_BNE_JSR(amountOflines,operation,status,workingStr);
+    }
     else {
-        parsedStr = parse_cmd(amountOflines,operation,status,workingStr);
 
+        parsedStr = parse_cmd(amountOflines,operation,status,workingStr);
     }
     if (*status <0) {
         free(strForToken);
         return parsedStr;
     }
-
-    return parsedStr; /*won't get here*/
+    free(strForToken);
+    return parsedStr;
 }
 
 char *add_ext_to_file(char *fileName,char *extension)
@@ -276,6 +279,7 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
     if (operation.attributeAmount == operand_1)
     {
         char *operandStr;
+
         if (count_char_in_string(wholeStr, ',') != 0)
         {
             *status = -3; /* invalid line */
@@ -299,18 +303,19 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
         if ( destinationAddress ==3)/*we also pass a register*/
         {
             char *firstWord = parse_first_word(operation.operationFunct,destinationRegister,destinationAddress,0,0,operation.operationNumber);
-            strcat(operandStr,firstWord);
+            strcat(parsedLine,firstWord);
             free(firstWord);
         }
         else if (destinationAddress ==1 || destinationAddress ==0)
         {
             char *firstWord = parse_first_word(operation.operationFunct,0,destinationAddress,0,0,operation.operationNumber);
-            strcat(operandStr,firstWord);
+            strcat(parsedLine,firstWord);
             free(firstWord);
         }
         if (destinationAddress ==0)
         {
-            char *temp =parse_to_binary(0,12);
+
+            char *temp =parse_to_binary(0,2);
             operandStr =parse_to_binary(destinationRegister,ASSEMBELED_LINE_LENGTH-2);
             strcat(operStr,"\n");
             strcat(operStr,operandStr);
@@ -320,6 +325,7 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
         }
         else if (destinationAddress ==1)
         {
+
             strcat(operStr, "\n");
             strcat(operStr, LABEL_SIGN);
             strcat(operStr, token);
@@ -427,8 +433,8 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
                 secondOper=parse_to_binary(destinationRegister,ASSEMBELED_LINE_LENGTH-2);
                 strcat(firstOper,temp);
                 free(temp);
-
-                temp = parse_to_binary(0,12);
+                ;
+                temp = parse_to_binary(0,2);
                 strcat(secondOper,temp);
                 free(temp);
 
@@ -449,7 +455,6 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
             {
                 char *temp =parse_to_binary(0,6);
                 secondOper=parse_to_binary(destinationAddress,6);
-
                 strcat(operStr,"\n");
                 strcat(operStr,LABEL_SIGN);
                 strcat(operStr,token);
@@ -463,7 +468,7 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
                 free(temp);
                 strcat(parsedLine,operStr);
 
-                free(secondToken);
+                free(secondOper);
             }
             else if (destinationAddress ==1)
             {
@@ -479,7 +484,6 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
             {
                 char *temp =parse_to_binary(0,2);
                 secondOper=parse_to_binary(destinationAddress,ASSEMBELED_LINE_LENGTH-2);
-
                 strcat(secondOper,temp);
                 free(temp);
                 strcat(operStr,"\n");
@@ -489,7 +493,7 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
                 strcat(operStr,secondOper);
                 strcat(parsedLine,operStr);
 
-                free(secondOper);
+               /* free(secondOper);*/
             }
         }
         else if (originAddress ==0)
@@ -510,18 +514,22 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
                 strcat(operStr,temp);
                 free(temp);
 
-                temp=parse_to_binary(0,12);
+                temp=parse_to_binary(0,2);
                 strcat(operStr,secondOper);
                 strcat(operStr,temp);
+                free(temp);
+                temp = parse_to_binary(0,10);
+                strcat(operStr,temp);
+                free(temp);
                 strcat(parsedLine,operStr);
 
-                free(temp);
-                free(firstOper);
-                free(secondOper);
+               /* free(secondOper);
+                free(firstOper);*/
+
             }
             else if (destinationAddress ==1)
             {
-                char *temp =parse_to_binary(0,12);
+                char *temp =parse_to_binary(0,2);
                 firstOper=parse_to_binary(originAddress,ASSEMBELED_LINE_LENGTH-2);
 
                 strcat(firstOper,temp);
@@ -538,7 +546,7 @@ char *parse_cmd(int *amountOfLines, operation_info operation, int *status, char 
             }
             else if (destinationAddress ==0)
             {
-                char *temp =parse_to_binary(0,12);
+                char *temp =parse_to_binary(0,2);
 
                 firstOper=parse_to_binary(originAddress,ASSEMBELED_LINE_LENGTH-2);
                 secondOper=parse_to_binary(destinationAddress,ASSEMBELED_LINE_LENGTH-2);
@@ -576,6 +584,7 @@ int parse_attribute_string(char *str, int *addressType,int *regOrNum)
         *regOrNum =strtol(str+1,NULL,10);
         return 0;
     }
+
     if (str[0]=='r')
     {
         if (strlen(str)<2)
@@ -597,8 +606,8 @@ int parse_attribute_string(char *str, int *addressType,int *regOrNum)
 }
 
 
-char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *status, char *wholeStr)
-{/*FUNCTION THAT PARSE JMP BNE AND JSR (oops caps) because of there model*/
+char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *status, char *wholeStr) {
+    /*FUNCTION THAT PARSE JMP BNE AND JSR (oops caps) because of there model*/
     int destinationAddress=1,firstAttributeVal=0,firstAttributeType =0,secondAttributeVal=0,secondAttributeType=0;
 
     char *attributeStr=(char *)calloc((ASSEMBELED_LINE_LENGTH+1)*(MAX_NUM_OF_CMDS-1)+1,sizeof(char));
@@ -608,9 +617,9 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
     char *token=strtok(NULL, " :,()\n");
     int attributeType=0;
     int attributeVal=0;
-    char *emptyLine= parse_to_binary(0,2);
+    char *emptyLine= parse_to_binary(0,ASSEMBELED_LINE_LENGTH);
     char *firstWord,*secondToken=NULL;
-
+    *amountOfLines=0;
     if (token ==NULL)
     {
         *status= -4; /*invalid attribute*/
@@ -644,9 +653,8 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
         strcat(attributeStr,"\n");
         strcat(attributeStr,LABEL_SIGN);
         strcat(attributeStr,token);
-        token =strtok(NULL, ",)");
     }
-    if (token !=NULL) {
+    if ((token =strtok(NULL, ",)")) !=NULL) {
         if (count_char_in_string(wholeStr,',')!=1)
         {
             *status =- 3; /*invalid Line*/
@@ -655,7 +663,7 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
         if (parse_attribute_string(token,&firstAttributeType,&firstAttributeVal)==- 1)
             *status= -4; /*invalid attribute*/
         secondToken=strtok(NULL, ",)");
-        if (secondToken !=NULL)
+        if ((secondToken =strtok(NULL, ",)")) !=NULL)
         {
             if (parse_attribute_string(secondToken,&secondAttributeType,&secondAttributeVal)==- 1)
                 *status= -4; /*invalid attribute*/
@@ -672,7 +680,7 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
 
             if (firstAttributeType==3 && secondAttributeType==3)
             {
-                char *temp =parse_to_binary(0,12);
+                char *temp =parse_to_binary(0,2);
                 (*amountOfLines)++;
                 firstStr=parse_to_binary(firstAttributeVal,6);
                 secondStr=parse_to_binary(secondAttributeVal,6);
@@ -688,7 +696,7 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
                 (*amountOfLines)++;
                 if (firstAttributeType !=1)
                 {
-                    char *temp =parse_to_binary(0,12);
+                    char *temp =parse_to_binary(0,2);
                     strcat(attributeStr,"\n");
                     firstStr=parse_to_binary(firstAttributeVal,ASSEMBELED_LINE_LENGTH-2);
                     strcat(attributeStr,firstStr);
@@ -703,7 +711,7 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
                 }
                 if (secondAttributeType !=1)
                 {
-                    char *temp =parse_to_binary(0,12);
+                    char *temp =parse_to_binary(0,2);
                     strcat(attributeStr,"\n");
                     secondStr=parse_to_binary(secondAttributeVal,ASSEMBELED_LINE_LENGTH-2);
                     strcat(attributeStr,secondStr);
@@ -723,9 +731,12 @@ char *parse_JMP_BNE_JSR(int *amountOfLines, operation_info operation, int *statu
                 free(firstStr);
         }
     }
-    else
+    else {
         if (count_char_in_string(wholeStr,',')!=0)
             *status= -3; /*invalid Line*/
+    }
+
+
 
     (*amountOfLines)++;
     firstWord = parse_first_word(operation.operationFunct,MAX(firstAttributeVal,0),destinationAddress,MAX(secondAttributeVal,0),0,operation.operationNumber);
@@ -752,4 +763,13 @@ enum labelType return_dot_type(char *str) {
      if (strcmp(str, ENTRY_MARK) == 0) /* there is a .string */
         return entry;
     return code;
+}
+
+
+void trim_trailing(char *str) {
+    int len = strlen(str);
+    while (len > 0 && (str[len - 1] == ' ' || str[len - 1] == '\n' || str[len - 1] == '\t')) {
+        str[len - 1] = '\0';
+        len--;
+    }
 }

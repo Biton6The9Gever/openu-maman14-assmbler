@@ -18,7 +18,6 @@
             while(fgets(workingLine,MAX_LINE_LENGTH,inputFile)!= NULL)
             {
                 int error = 0;
-                char *temp=NULL;
                 macroList *macroFound =NULL;
                 if(currentState != count )
                 {
@@ -31,20 +30,19 @@
                 }
 
                 workingLine = pointer_to_first_char(workingLine);
-                temp = format_string(workingLine);
+/*                printf("wokring line: %s\n length %lu \n : eend mark len: %lu ",workingLine,strlen(workingLine),strlen(MACRO_END_MARK));*/
                 if((macroFound = check_if_macro_exist(head,workingLine)) != NULL ) /*macro exist replace the name with the code*/
                 {
                     fprintf(outputFile,"%s", macroFound->data);
-
                     /*if the macro data is either nothing or '\n'*/
                     if (*macroFound->data != '\n' && *macroFound->data != '\0')
                         fprintf(outputFile, "\n");
                 }
-                else if((strncmp(workingLine,MACRO_START_MARK,strlen(MACRO_START_MARK)) == 0) && (strlen(temp) == strlen(MACRO_START_MARK)))
+                else if((strncmp(workingLine,MACRO_START_MARK,strlen(MACRO_START_MARK)) == 0) && (strlen(format_string(workingLine)) == strlen(MACRO_START_MARK)))
                 {
                    /*we entered macro declaration */
-                    char *macroName;
 
+                    char *macroName;
                     if(check_if_macro_exist(head,workingLine+strlen(MACRO_START_MARK)) != NULL)
                     {
                       printf("ERROR | cannot declare macro twice | Line: %d\n",currentLine);
@@ -80,26 +78,31 @@
                     {/*macro name is empty illegal declaration*/
                         printf("ERROR | cannot set empty macro name | Line: %d\n",currentLine);
                         errorAmount++;
+                        continue;
                     }
                     else if(return_opertaion(macros -> name).operationName != none_oper)
                     {/*check if the macro name is operation name illegal declaration*/
                         printf("ERROR | cannot set macro name same as a command | Line: %d\n",currentLine);
                         errorAmount++;
+                        continue;
                     }
                     else if(return_register_name(macros->name)!= -1)
                     {
                       	printf("ERROR | cannot set macro name same as a register | Line: %d\n",currentLine);
                         errorAmount++;
+                        continue;
                     }
                     else if (return_direct_value(macros->name)!= -1)
                     {
                         printf("ERROR | cannot set macro name same as a direct number | Line: %d\n",currentLine);
                         errorAmount++;
+                        continue;
                     }
 
 
                 }
-                else if((strncmp(workingLine,MACRO_END_MARK,strlen(MACRO_END_MARK)) == 0) &&strlen(workingLine) == strlen(MACRO_END_MARK) + 1)
+                    /*                                                  plus +2 because of ניסוי וטעיה  plus +1 for \n */
+                else if((strncmp(workingLine,MACRO_END_MARK,strlen(MACRO_END_MARK)) == 0) &&  (strlen(workingLine) == strlen(MACRO_END_MARK) + 2|| strlen(workingLine) == strlen(MACRO_END_MARK) + 1))
                 {/*+1 because of the new line \n char*/
                   	if(currentState==count)
                    {
@@ -125,13 +128,11 @@
                 else if(currentState == save)
                 {
                     strcat(macros->data,workingLine);
-                    printf("MACRO-SAVE\n");
                     free(parse_line(workingLine,&numOfLinesFromParseLine,&error));
                 }
                 else if (currentState == copy)
                 {
                     fprintf(outputFile,"%s",workingLine);
-                    printf("MACRO-COPY\n");
                     free(parse_line(workingLine,&numOfLinesFromParseLine,&error));
                 }
 
@@ -150,14 +151,12 @@
                     printf("ERROR | Invalid operand | Line: %d\n",currentLine);
                     errorAmount++;
                 }
-                    free(temp);
 
             }
-        free(orignLine);
-        /*free_macro_list(macros);*/
-        if (errorAmount > 0)
-            return -1;
-        return numOfLinesFromParseLine++;
+
+        /*free(orignLine);*/
+        /*free_macro_list(head);*/
+        return 0;
     }
 
 

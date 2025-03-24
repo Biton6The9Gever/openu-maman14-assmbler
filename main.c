@@ -28,14 +28,13 @@ int main(int argc, char **argv) {
         }
         afterPreAssmblerFileName=add_ext_to_file(argv[fileNumber],AFTER_PREASSEMBLER_EXT);
         afterPreAssmblerFile = fopen(afterPreAssmblerFileName,"w+");
-        printf("PRE PARSE-MACRO\n");
         errorMacro= parse_macro(currentFile,afterPreAssmblerFile);
-        printf("PARSE-MACRO\n");
         fclose(afterPreAssmblerFile);
         afterPreAssmblerFile = fopen(afterPreAssmblerFileName,"r");
+        printf("AFTER MACRO \n");
         labelTable = first_scan(afterPreAssmblerFile,&instructionLength,&dataLength,&error);
         fclose(afterPreAssmblerFile);
-        printf("%d \n",errorMacro);
+        printf("MACRo: %d \n %d \n",errorMacro,error);
 
         if (error > 0 || errorMacro < 0)
         {
@@ -63,20 +62,10 @@ int main(int argc, char **argv) {
                 free_labels_list(labelTable);
                 labelTable = NULL;
             }
-            fclose(fileFirstScan);
-            remove(fileFirstScanName);
-            free(fileFirstScanName);
-            free(currentFileName);
-            fclose(currentFile);
 
             fileNumber++;
         }
         else {
-            free(currentFileName);
-            fclose(currentFile);
-            free(fileFirstScanName);
-            fclose(fileFirstScan);
-            free(afterPreAssmblerFileName);
 
 
             if (labelTable != NULL)

@@ -21,70 +21,55 @@ int second_scan(FILE *outputFile, char *fileName, labelsList *head, int instruct
     char *originLine = (char *)malloc(MAX_LINE_LENGTH * sizeof(char));
     char *workingLine = originLine;
 
+    printLabelsList(head);
+    printLabelsList(head);
     /* print instruction and data length in hex */
-    fprintf(outputFile, "\t\t%s %s\n", parse_to_hex(instructionLength, 7), parse_to_hex(dataLength, 7));
+    fprintf(outputFile, "\t\t%d %d\n", instructionLength, dataLength);
 
     while (fgets(workingLine, MAX_LINE_LENGTH, inputFile) != NULL)
     {
-        char *IC_hex = parse_to_hex(IC, 7);
         workingLine = pointer_to_first_char(workingLine);
-
-        /* converts IC to hex */
-
-
-        /* if the line isn't a label, print it directly */
-        if (strncmp(workingLine, LABEL_SIGN, strlen(LABEL_SIGN)) != 0)
-        {
-            fprintf(outputFile, "%s\t  %s", IC_hex, workingLine);
+        /*not label add address of the current line to .ob*/
+        if (strncmp(workingLine,LABEL_SIGN,strlen(LABEL_SIGN)) != 0) {
+            char *IC_hex =parse_to_hex(IC, 7);
+            fprintf(outputFile,"%s\t  %s",IC_hex ,workingLine);
         }
-        else /*  label found add the label address to the ob file */
-        {
-            char *labelAddress = NULL, *labelToSearch = workingLine + strlen(LABEL_SIGN);
+        else {
+            char labelAddres[8],*labelNameSearch=workingLine+strlen(LABEL_SIGN);
+            char *IC_hex=NULL;
             labelsList *label;
-
-            if (strlen(workingLine) > strlen(LABEL_SIGN))
-            {
-                labelToSearch[strcspn(labelToSearch, "\n")] = '\0';
-                label = check_if_label_exist(head, labelToSearch);
+            printf("%s \n",labelNameSearch);
+            if (strlen(workingLine)>strlen(LABEL_SIGN)) {
+                labelNameSearch[strcspn(labelNameSearch,"\n")]='\0';
+                label = check_if_label_exist(head,labelNameSearch);
             }
 
-            if (label == NULL)
-            {
-                printf("ERROR | Undefined label: %s\n", labelToSearch);
+            if (label == NULL) {
+                printf(" ERROR | there isn't dec for label %s \n",labelNameSearch);
                 error = 1;
-                free(IC_hex);
                 break;
             }
+            if (label->type !=external) {
+                IC_hex=parse_to_hex(IC,7);
+                sprintf(labelAddres, "%07d", label->location);
+                fprintf(outputFile,"%s\t  %p\n",IC_hex ,labelAddres);
 
-            if (label->type != external)
-            {
-                char *temp = parse_to_hex(2, 6);
-                labelAddress = parse_to_hex(label->location, 6);
-                fprintf(outputFile, "%s\t  %s%s\n", IC_hex, labelAddress, temp);
-                free(temp);
-
-                /* if label is .entry, add it to .ent file */
-                if (label->type == entry || label->type == entry_data)
-                {
+                if (label->type == entry_data || label->type==entry)
                     isEnt = 1;
-                    fprintf(entFile, "%s\t  %s\n", labelToSearch, labelAddress);
-                }
             }
-            else if (label->type == external)
-            {
-                char *temp = parse_to_hex(1, 6);
-                labelAddress = parse_to_hex(0, 6);
-                fprintf(outputFile, "%s\t  %s%s\n", IC_hex, labelAddress, temp);
-                free(temp);
+            else if (label->type ==external) {
+                IC_hex=parse_to_hex(IC,7);
+                sprintf(labelAddres, "%07d", label->location);
+                fprintf(outputFile,"%s\t  %p\n",IC_hex ,labelAddres);
 
-                fprintf(extFile, "%s\t  %s\n", labelToSearch, IC_hex);
+                fprintf(extFile,"%s\t  %07d \n",labelNameSearch ,IC);
                 isExt = 1;
             }
-            if (labelAddress != NULL)
-                free(labelAddress);
+            if (IC_hex != NULL) {
+                free(IC_hex);
+            }
         }
-        free(IC_hex);
-        IC++;
+        IC ++;
     }
 
     isEnt = print_entry_exist(head, entFile);
@@ -92,16 +77,14 @@ int second_scan(FILE *outputFile, char *fileName, labelsList *head, int instruct
     fclose(extFile);
     fclose(inputFile);
 
-    if (isExt == 0 || error != 0)
+    if (isExt == 0 || error != 0)/*if there are no .extern labels*/
         remove(fileExtName);
-    if (isEnt == 0 || error != 0)
+    if (isEnt == 0 || error != 0)/*if there are no .entry labels*/
         remove(fileEntName);
-
     free(originLine);
     free(fileEntName);
     free(fileExtName);
     remove(FIRSTSCAN_TEMP_FILE_NAME);
-
     return error;
 }
 
@@ -114,7 +97,7 @@ int print_entry_exist(labelsList *head, FILE *entryFile)
         if (head->type == entry || head->type == entry_data)
         {
             isExists = 1; /* true */
-            fprintf(entryFile, "%s\t  %s\n", head->name, parse_to_hex(head->location, 6));
+            fprintf(entryFile, "%s\t  %07d\n", head->name, head->location);
         }
         head = head->next;
     }
