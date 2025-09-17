@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2024.3.4\bin\cmake\win\x64\bin\cmake.exe" -E rm -f CMakeFiles\openu_project.dir/objects.a
+C:\PROGRA~1\JETBRA~1\CLION2~1.4\bin\mingw\bin\ar.exe qc CMakeFiles\openu_project.dir/objects.a @CMakeFiles\openu_project.dir\objects1.rsp
+C:\PROGRA~1\JETBRA~1\CLION2~1.4\bin\mingw\bin\gcc.exe  −Wall −ansi −pedantic −g -g -Wl,--whole-archive CMakeFiles\openu_project.dir/objects.a -Wl,--no-whole-archive -o openu_project.exe -Wl,--out-implib,libopenu_project.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\openu_project.dir\linkLibs.rsp

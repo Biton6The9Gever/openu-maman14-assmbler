@@ -1,0 +1,10 @@
+"C:\Program Files\JetBrains\CLion 2024.3.4\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" -S D:\Biton\VisualStudio\.VSC\C\Project -B D:\Biton\VisualStudio\.VSC\C\Project\cmake-build-debug
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: D:/Biton/VisualStudio/.VSC/C/Project/cmake-build-debug
+
+Problems were encountered while collecting compiler information:
+	cc1.exe: fatal error: −Wall: No such file or directory
+	cc1.exe: fatal error: −ansi: No such file or directory
+	cc1.exe: fatal error: −pedantic: No such file or directory
+	cc1.exe: fatal error: −g: No such file or directory

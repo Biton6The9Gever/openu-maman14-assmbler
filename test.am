@@ -1,0 +1,12 @@
+MAIN: add      r3, r4
+LOOP: prn      #48
+lea      r4, r6
+inc      r6
+mov      r3, r4
+sub      r1, r4
+bne      END
+cmp      r4, #-6
+bne      &END
+dec      K
+jmp      &LOOP
+END:       stop
